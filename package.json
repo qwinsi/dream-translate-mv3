@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
-    "build": "echo Done"
+    "build": "bun build --entrypoints src/js/background.js --outdir ./dist/js"
   },
   "devDependencies": {
     "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "blueimp-md5": "^2.19.0"
   }
 }

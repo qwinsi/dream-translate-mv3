@@ -1,4 +1,5 @@
-'use strict'
+import { md5 } from "blueimp-md5";
+
 
 /**
  * Dream Translate
