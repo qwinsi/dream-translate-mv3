@@ -288,7 +288,7 @@ export function addClass(el, className) {
     }
 }
 
-function rmClass(el, className) {
+export function rmClass(el, className) {
     if (!el.className) return
     className = className.trim()
     let newClassName = el.className.trim()

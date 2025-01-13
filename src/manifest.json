@@ -17,7 +17,6 @@
         "\u003Call_urls>"
       ],
       "js": [
-        "js/common.js",
         "js/content.js"
       ],
       "css": [

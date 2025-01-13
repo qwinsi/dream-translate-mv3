@@ -1,4 +1,8 @@
-'use strict'
+import {
+    storageLocalGet, storageSyncGet, B, storageShowAll, debug, addClass, rmClassD, sendMessage, _setTimeout,
+    rmClass, hasClass, getSearchList, onD, execCopy, inArray, execPaste, isArray, storageSyncSet,
+    getTimestamp
+} from './common-m';
 
 /**
  * Dream Translate
@@ -17,7 +21,7 @@ let dialog, shadow,
     root = B.root
 let dQuery = {action: '', text: '', source: '', target: ''}
 let textTmp = ''
-let history = [], historyIndex = 0, disHistory = false
+let queryHistory = [], historyIndex = 0, disHistory = false
 let searchText
 document.addEventListener('DOMContentLoaded', async function () {
     let u = new URL(location.href)
@@ -276,7 +280,7 @@ function initDialog() {
     let hlEl = hEl.querySelector('.dmx-icon-left')
     let hrEl = hEl.querySelector('.dmx-icon-right')
     let loadHistory = function (index) {
-        if (index < 0 || index >= history.length) return
+        if (index < 0 || index >= queryHistory.length) return
         disHistory = true
         historyIndex = index
 
@@ -285,12 +289,12 @@ function initDialog() {
         rmClass(hrEl, className)
         if (index === 0) {
             addClass(hlEl, className)
-        } else if (index === history.length - 1) {
+        } else if (index === queryHistory.length - 1) {
             addClass(hrEl, className)
         }
 
-        let data = history[index]
-        debug('current:', historyIndex, data, history)
+        let data = queryHistory[index]
+        debug('current:', historyIndex, data, queryHistory)
         let action = data.action
         let text = data.text
         dialogConf.action = action
@@ -1082,15 +1086,15 @@ function checkChange(action, text) {
 function addHistory(dQuery) {
     if (disHistory) return disHistory = false
     if (!['translate', 'dictionary', 'search'].includes(dQuery.action)) return
-    if (historyIndex < history.length - 1) {
-        history.splice(historyIndex + 1, history.length)
-    } else if (history.length >= 1000) {
-        history.shift() // 最多只保留 1000 条
+    if (historyIndex < queryHistory.length - 1) {
+        queryHistory.splice(historyIndex + 1, queryHistory.length)
+    } else if (queryHistory.length >= 1000) {
+        queryHistory.shift() // 最多只保留 1000 条
     }
-    history.push(dQuery)
-    historyIndex = history.length - 1
-    debug('history:', history, historyIndex)
-    if (history.length > 1) {
+    queryHistory.push(dQuery)
+    historyIndex = queryHistory.length - 1
+    debug('history:', queryHistory, historyIndex)
+    if (queryHistory.length > 1) {
         let hEl = I('dmx_history')
         rmClass(hEl.querySelector('.dmx-icon-left'), 'disabled')
         addClass(hEl.querySelector('.dmx-icon-right'), 'disabled')

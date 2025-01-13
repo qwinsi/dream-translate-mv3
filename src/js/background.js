@@ -859,6 +859,7 @@ function sliceStr(text, maxLen) {
     return r
 }
 
+window.textTmp = textTmp
 window.setting = setting;
 window.invertObject = invertObject;
 window.cleanAttr = cleanAttr;
