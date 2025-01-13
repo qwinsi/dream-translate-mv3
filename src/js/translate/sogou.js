@@ -1,4 +1,4 @@
-import { httpGet, debug, getJSONValue, isString, isObject, isArray } from "../common-m";
+import { httpGet, debug, getJSONValue, isString, isObject, isArray } from "../common";
 
 /**
  * Dream Translate

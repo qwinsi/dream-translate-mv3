@@ -4,7 +4,7 @@ import {
     isFirefox, B, storageLocalSet, debug, storageSyncGet, getSearchList, uniqueArray, storageShowAll,
     sendTabMessage, getActiveTabId, getJSONValue, execCopy, sandFgMessage, httpPost, httpGet,
     getTimestamp, storageSyncSet, sleep, _setTimeout
-} from "./common-m";
+} from "./common";
 
 /**
  * Dream Translate

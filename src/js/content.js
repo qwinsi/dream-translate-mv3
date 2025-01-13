@@ -2,7 +2,7 @@ import {
     storageLocalGet, storageSyncGet, B, storageShowAll, debug, addClass, rmClassD, sendMessage, _setTimeout,
     rmClass, hasClass, getSearchList, onD, execCopy, inArray, execPaste, isArray, storageSyncSet,
     getTimestamp
-} from './common-m';
+} from './common';
 
 /**
  * Dream Translate
