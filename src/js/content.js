@@ -47,6 +47,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 是否开启自动解除选中现在
     if (setting.allowSelect === 'on' && !isSome) allowUserSelect()
 
+    // drag event
+    if (setting.scribble === 'drag') {
+        bindDragEvent();
+    }
+
     // 查看全部数据
     storageShowAll()
 })
@@ -89,6 +94,13 @@ B.storage.onChanged.addListener(function (data) {
     keys.forEach(k => {
         let v = data[k].newValue
         if (k === 'setting') {
+            // decide whether to toggle drag event listener
+            if (setting.scribble === 'drag' && v.scribble !== 'drag') {
+                unbindDragEvent();
+            } else if (setting.scribble !== 'drag' && v.scribble === 'drag') {
+                bindDragEvent();
+            }
+
             setting = v
             debug('new setting:', v)
 
@@ -100,6 +112,48 @@ B.storage.onChanged.addListener(function (data) {
         }
     })
 })
+
+
+function isTextArea(element) {
+    return element.matches(
+        'input[type="email"], input[type="number"], input[type="password"], input[type="search"], ' +
+        'input[type="tel"], input[type="text"], input[type="url"], textarea'
+    ) && !element.disabled;
+};
+
+// Code from https://github.com/iorate/uSuperDrag (MIT license)
+function dropEventListener(event) {
+
+    if (event.dataTransfer.types.includes('text/plain')) {
+        if (!isTextArea(event.target)) {
+            let text = event.dataTransfer.getData('text/plain');
+            text = text.trim();
+            if (text !== '') {
+                sendQuery(text);
+                showDialog(event.clientX + 10, event.clientY - 35)
+            }
+
+            event.preventDefault();
+        }
+    }
+}
+
+function bindDragEvent() {
+    document.addEventListener('dragover', event => {
+    if (event.dataTransfer.types.includes('text/plain')) {
+        if (!isTextArea(event.target)) {
+            event.dataTransfer.dropEffect = 'link';
+            event.preventDefault();
+        }
+    }
+    }, false);
+
+    document.addEventListener('drop', dropEventListener, false);
+}
+
+function unbindDragEvent() {
+    document.removeEventListener('drop', dropEventListener, false);
+}
 
 // 初始对话框
 function initDialog() {
