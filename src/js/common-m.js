@@ -15,7 +15,7 @@
  * https://developer.chrome.com/docs/extensions/reference/
  * https://crxdoc-zh.appspot.com/extensions/
  */
-const isDebug = true
+const isDebug = false;
 
 export const isFirefox = navigator.userAgent.includes("Firefox");
 window.isFirefox = isFirefox
