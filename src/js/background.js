@@ -6,6 +6,12 @@ import {
     getTimestamp, storageSyncSet, sleep, _setTimeout
 } from "./common";
 
+// Using `window` globals in ManifestV3 service worker background script - Stack Overflow
+// https://stackoverflow.com/questions/73778202/
+if (typeof window === 'undefined') {
+    var window = self;
+}
+
 /**
  * Dream Translate
  * https://github.com/ryanker/dream_translate
@@ -18,7 +24,7 @@ let searchText, searchList
 let ocrToken = '', ocrExpires = 0
 var textTmp = ''
 var historyMax = 3000
-document.addEventListener('DOMContentLoaded', async function () {
+async function main() {
     let languageList = '', dialogCSS = '', dictionaryCSS = {}
     await fetch('../conf/conf.json').then(r => r.json()).then(r => {
         conf = r
@@ -63,7 +69,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // 查看全部数据
     storageShowAll()
-})
+}
+
 
 // 添加上下文菜单
 B.contextMenus.create({
@@ -329,7 +336,7 @@ function saveSettingAll(data, updateIcon, resetDialog) {
 }
 
 function changeBrowserIcon(scribble) {
-    B.browserAction.setIcon({path: `icon/128${scribble === 'off' ? '_off' : ''}.png`})
+    B.browserAction.setIcon({path: `../icon/128${scribble === 'off' ? '_off' : ''}.png`})
     // setBrowserAction(scribble === 'off' ? 'OFF' : '')
 }
 
@@ -870,3 +877,5 @@ window.reloadTmpTab = reloadTmpTab;
 window.openFrame = openIframe;
 window.removeFrame = removeIframe;
 window.sliceStr = sliceStr;
+
+void main();

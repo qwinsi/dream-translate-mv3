@@ -1,5 +1,9 @@
 'use strict'
 
+if(typeof window === 'undefined') {
+    var window = self;
+}
+
 /**
  * Dream Translate
  * https://github.com/ryanker/dream_translate
@@ -32,13 +36,13 @@ export const B = {
     onMessage: chrome.runtime.onMessage,
     sendMessage: chrome.runtime.sendMessage,
     storage: chrome.storage,
-    browserAction: chrome.browserAction,
+    browserAction: chrome.action,
     contextMenus: chrome.contextMenus,
     webRequest: chrome.webRequest,
     cookies: chrome.cookies,
     tabs: chrome.tabs,
     tts: chrome.tts,
-    app: chrome.app,
+    // app: chrome.app,
 }
 String.prototype.format = function () {
     let args = arguments
@@ -76,7 +80,7 @@ export function storageShowAll() {
 function storage(type, method, options) {
     return new Promise((resolve, reject) => {
         if (!isFirefox) {
-            if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
+            // if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
             let callback = function (r) {
                 let err = B.runtime.lastError
                 err ? reject(err) : resolve(r)
@@ -101,7 +105,7 @@ function storage(type, method, options) {
 export function cookies(method, options) {
     return new Promise((resolve, reject) => {
         if (!isFirefox) {
-            if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
+            // if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
             let callback = function (r) {
                 let err = B.runtime.lastError
                 err ? reject(err) : resolve(r)
@@ -132,7 +136,7 @@ export function cookies(method, options) {
 export function sendMessage(message) {
     return new Promise((resolve, reject) => {
         if (!isFirefox) {
-            if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
+            // if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
             B.sendMessage(message, r => B.runtime.lastError ? reject(B.runtime.lastError) : resolve(r))
         } else {
             browser.runtime.sendMessage(message).then(r => resolve(r), err => reject(err))
@@ -143,7 +147,7 @@ export function sendMessage(message) {
 export function sendTabMessage(tabId, message) {
     return new Promise((resolve, reject) => {
         if (!isFirefox) {
-            if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
+            // if (typeof B.app.isInstalled === 'undefined') return reject('The extension has been updated!')
             tabId && B.tabs.sendMessage(tabId, message, r => B.runtime.lastError ? reject(B.runtime.lastError) : resolve(r))
         } else {
             tabId && browser.tabs.sendMessage(tabId, message).catch(err => debug('send error:', err))

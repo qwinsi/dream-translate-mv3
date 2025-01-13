@@ -2,14 +2,12 @@
   "name": "Dream Translator",
   "description": "梦想划词翻译是为阅读和学习外语而开发的一款翻译和查词工具，聚合数十款在线词典和在线翻译。",
   "version": "1.6.27",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "icons": {
     "128": "icon/128.png"
   },
   "background": {
-    "scripts": [
-      "js/background.js"
-    ]
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
@@ -34,14 +32,21 @@
       ]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "html/popup.html",
     "default_title": "梦想划词翻译",
     "default_icon": "icon/128.png"
   },
   "web_accessible_resources": [
-    "css/*",
-    "html/*"
+    {
+      "resources": [
+        "css/*",
+        "html/*"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
   ],
   "permissions": [
     "storage",
@@ -52,7 +57,9 @@
     "webRequest",
     "webRequestBlocking",
     "unlimitedStorage",
-    "tts",
+    "tts"
+  ],
+  "host_permissions": [
     "\u003Call_urls>"
   ],
   "homepage_url": "https://github.com/qwinsi/dream-translator",
