@@ -6,6 +6,8 @@
     "build": "bun build --entrypoints src/js/background.js --outdir ./dist/js"
   },
   "devDependencies": {
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
     "rimraf": "^3.0.2"
   },
   "dependencies": {

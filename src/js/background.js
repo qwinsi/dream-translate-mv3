@@ -1,5 +1,10 @@
-import { md5 } from "blueimp-md5";
-
+import md5 from "blueimp-md5";
+import { idb, initFavorite, initHistory } from "./db";
+import {
+    isFirefox, B, storageLocalSet, debug, storageSyncGet, getSearchList, uniqueArray, storageShowAll,
+    sendTabMessage, getActiveTabId, getJSONValue, execCopy, sandFgMessage, httpPost, httpGet,
+    getTimestamp, storageSyncSet, sleep, _setTimeout
+} from "./common-m";
 
 /**
  * Dream Translate
@@ -190,7 +195,7 @@ function runDictionary(tabId, m) {
             sd.query(text).then(result => {
                 debug(`${name}:`, result)
                 let {sound} = result
-                if (sound && sound.length > 0) dictionarySounds[name] = sound // 记录发音
+                if (sound && sound.length > 0) window.dictionarySounds[name] = sound // 记录发音
                 sandFgMessage(tabId, {action, name, result})
             }).catch(error => {
                 sandFgMessage(tabId, {action, name, text, error})
@@ -331,6 +336,7 @@ function changeBrowserIcon(scribble) {
 function setBrowserAction(text) {
     B.browserAction.setBadgeText({text: text || ''})
     B.browserAction.setBadgeBackgroundColor({color: 'red'})
+    // @ts-ignore setBadgeTextColor is not exist in type
     isFirefox && B.browserAction.setBadgeTextColor({color: 'white'})
 }
 
@@ -388,6 +394,7 @@ function openWindow(wid, width, height, url, reopen) {
         o.left = Math.floor(left > 0 ? left : (screen.width - o.width) / 2)
         o.top = Math.floor(top > 0 ? top : (screen.height - o.height) / 2)
 
+        // @ts-ignore
         B.windows.create(o, w => window[name] = w.id)
     }
     let id = window[name]
@@ -593,12 +600,13 @@ function playAudio(url) {
             blobUrl = URL.createObjectURL(url)
             a.src = blobUrl
         } else {
-            return reject('Audio url error:', url)
+            return reject('Audio url error:' + url)
         }
         a.onended = function () {
             // if (blobUrl) URL.revokeObjectURL(blobUrl) // 释放内存
             resolve()
             let url = a.src // 记录最后一次播放的链接
+            // @ts-ignore
             window.audioSrc = {url}
             getAudioBlob(url).then(b => window.audioSrc.blob = b)
         }
@@ -635,6 +643,7 @@ function sdkInit(name) {
     return new Promise((resolve, reject) => {
         if (sdk[name]) return resolve(sdk[name])
         if (typeof window[name] === 'function') {
+            // @ts-ignore
             sdk[name] = new window[name]().init()
             resolve(sdk[name])
         } else {
@@ -767,9 +776,11 @@ function openIframe(id, url, timeout) {
     if (!el) {
         el = document.createElement('iframe')
         el.id = ifrId
+        // @ts-ignore
         el.src = url
         document.body.appendChild(el)
     } else {
+        // @ts-ignore
         el.src = url
     }
 

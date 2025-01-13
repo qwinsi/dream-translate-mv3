@@ -7,7 +7,7 @@
  * @license MIT License
  */
 
-function idb(dbName, version, onupgradeneeded) {
+export function idb(dbName, version, onupgradeneeded) {
     return new Promise((resolve, reject) => {
         let req = window.indexedDB.open(dbName, version)
         req.onupgradeneeded = onupgradeneeded // 首次创建或更高版本号时执行
@@ -133,7 +133,7 @@ function rmIdb(dbName) {
 }
 
 // 创建存储对象: 收藏
-function initFavorite(e) {
+export function initFavorite(e) {
     let store, db = e.target.result
 
     // sentence
@@ -166,7 +166,7 @@ function initFavorite(e) {
 }
 
 // 创建存储对象: 历史
-function initHistory(e) {
+export function initHistory(e) {
     let store, db = e.target.result
 
     // history

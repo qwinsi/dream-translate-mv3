@@ -8,8 +8,6 @@
   },
   "background": {
     "scripts": [
-      "js/common.js",
-      "js/db.js",
       "js/background.js"
     ]
   },
