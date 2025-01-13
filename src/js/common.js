@@ -15,7 +15,7 @@
  * https://developer.chrome.com/docs/extensions/reference/
  * https://crxdoc-zh.appspot.com/extensions/
  */
-const isDebug = true
+const isDebug = false
 window.isFirefox = navigator.userAgent.includes("Firefox")
 // window.isFirefox = typeof browser !== "undefined" && Object.getPrototypeOf(browser) === Object.prototype
 const B = {
