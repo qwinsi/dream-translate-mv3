@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
-    "build": "bun build --entrypoints src/js/background.js --outdir ./dist/js"
+    "build": "bun build --entrypoints src/js/background.js --outdir ./dist/js && bun build --entrypoints src/js/translate/sogou.js --outdir ./dist/js/translate"
   },
   "devDependencies": {
     "eslint": "^9.18.0",

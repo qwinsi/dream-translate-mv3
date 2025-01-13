@@ -1,4 +1,4 @@
-'use strict'
+import { httpGet, debug, getJSONValue, isString, isObject, isArray } from "../common-m";
 
 /**
  * Dream Translate
@@ -310,3 +310,5 @@ function sogouTranslate() {
         },
     }
 }
+
+window.sogouTranslate = sogouTranslate;

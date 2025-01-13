@@ -654,6 +654,7 @@ function sdkInit(name) {
     })
 }
 
+// load sogou.js etc.
 function loadJs(arr, type) {
     arr.forEach(k => {
         let el = document.createElement("script")
@@ -857,3 +858,14 @@ function sliceStr(text, maxLen) {
     }
     return r
 }
+
+window.setting = setting;
+window.invertObject = invertObject;
+window.cleanAttr = cleanAttr;
+window.checkRetry = checkRetry;
+window.createTmpTab = createTmpTab;
+window.removeTmpTab = removeTmpTab;
+window.reloadTmpTab = reloadTmpTab;
+window.openFrame = openIframe;
+window.removeFrame = removeIframe;
+window.sliceStr = sliceStr;
