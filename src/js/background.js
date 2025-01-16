@@ -77,20 +77,22 @@ async function main() {
 
 
 // 添加上下文菜单
-B.contextMenus.create({
-    id: "dream-translate-context-menu",
-    title: "梦想翻译“%s”",
-    contexts: ["selection"],
-    // onclick: function (info, tab) {
-    //     if (!info.selectionText) return
-    //     let msg = {action: 'contextMenus', text: info.selectionText}
-    //     if (tab && tab.id > 0) {
-    //         sendTabMessage(tab.id, msg)
-    //     } else {
-    //         getActiveTabId().then(tabId => sendTabMessage(tabId, msg))
-    //     }
-    // }
-})
+B.runtime.onInstalled.addListener(function () {
+    B.contextMenus.create({
+        id: "dream-translate-context-menu",
+        title: "梦想翻译“%s”",
+        contexts: ["selection"],
+        // onclick: function (info, tab) {
+        //     if (!info.selectionText) return
+        //     let msg = {action: 'contextMenus', text: info.selectionText}
+        //     if (tab && tab.id > 0) {
+        //         sendTabMessage(tab.id, msg)
+        //     } else {
+        //         getActiveTabId().then(tabId => sendTabMessage(tabId, msg))
+        //     }
+        // }
+    })
+});
 
 
 B.contextMenus.onClicked.addListener(function (info, tab) {
