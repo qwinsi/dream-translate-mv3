@@ -55,7 +55,6 @@
     "cookies",
     "contextMenus",
     "webRequest",
-    "webRequestBlocking",
     "unlimitedStorage",
     "tts"
   ],
