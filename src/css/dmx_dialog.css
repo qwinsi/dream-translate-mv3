@@ -109,6 +109,10 @@ blockquote {
     box-sizing: border-box;
     box-shadow: 0 0 12px -2px rgba(32, 32, 32, .5);
     display: none;
+
+    /* Some websites (e.g. github.com) will set color-scheme: dark/light according to the system theme,
+       but the dialog is not prepared for dark mode, so we need to force it to light mode. */
+    color-scheme: light;
 }
 
 #dmx_dialog.dmx_keep_right {
