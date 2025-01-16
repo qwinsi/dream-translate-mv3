@@ -688,13 +688,24 @@ function sdkInit(name) {
     })
 }
 
+// Unfortunately, calling importScripts() inside a function is not allowed.
+// So just load all needed scripts manually here.
+// https://stackoverflow.com/questions/36251929/how-to-load-javascript-file-in-a-service-worker-dynamically
+importScripts('translate/sogou.js');
+importScripts('translate/youdao.js');
+importScripts('dictionary/youdao.js');
+
 // load sogou.js etc.
 function loadJs(arr, type) {
     arr.forEach(k => {
-        let el = document.createElement("script")
-        el.type = 'text/javascript'
-        el.src = `/js/${type || 'translate'}/${k}.js`
-        document.head.appendChild(el)
+        // let el = document.createElement("script")
+        // el.type = 'text/javascript'
+        // el.src = `/js/${type || 'translate'}/${k}.js`
+        // document.head.appendChild(el)
+
+
+        // const path = `../js/${type || 'translate'}/${k}.js`
+        // importScripts(path);
     })
 }
 
