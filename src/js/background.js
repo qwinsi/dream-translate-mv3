@@ -77,9 +77,23 @@ async function main() {
 
 // 添加上下文菜单
 B.contextMenus.create({
+    id: "dream-translate-context-menu",
     title: "梦想翻译“%s”",
     contexts: ["selection"],
-    onclick: function (info, tab) {
+    // onclick: function (info, tab) {
+    //     if (!info.selectionText) return
+    //     let msg = {action: 'contextMenus', text: info.selectionText}
+    //     if (tab && tab.id > 0) {
+    //         sendTabMessage(tab.id, msg)
+    //     } else {
+    //         getActiveTabId().then(tabId => sendTabMessage(tabId, msg))
+    //     }
+    // }
+})
+
+
+B.contextMenus.onClicked.addListener(function (info, tab) {
+    if(info.menuItemId === "dream-translate-context-menu") {
         if (!info.selectionText) return
         let msg = {action: 'contextMenus', text: info.selectionText}
         if (tab && tab.id > 0) {
@@ -88,7 +102,8 @@ B.contextMenus.create({
             getActiveTabId().then(tabId => sendTabMessage(tabId, msg))
         }
     }
-})
+});
+
 
 // 监听消息
 B.onMessage.addListener(function (m, sender, sendResponse) {
@@ -362,18 +377,26 @@ function addMenu(name, title, url) {
         id: 'page_' + mid,
         title: title + '首页',
         contexts: ["page"],
-        onclick: function () {
-            B.tabs.create({url: (new URL(url)).origin})
-        }
+        // onclick: function () {
+            // B.tabs.create({url: (new URL(url)).origin})
+        // }
     })
     B.contextMenus.create({
         id: 'selection_' + mid,
         title: title + "“%s”",
         contexts: ["selection"],
-        onclick: function (info) {
+        // onclick: function (info) {
+            // B.tabs.create({url: url.format(decodeURIComponent(info.selectionText))})
+        // }
+    })
+
+    B.contextMenus.onClicked.addListener(function (info, tab) {
+        if(info.menuItemId === 'page_' + mid) {
+            B.tabs.create({url: (new URL(url)).origin})
+        } else if(info.menuItemId === 'selection_' + mid) {
             B.tabs.create({url: url.format(decodeURIComponent(info.selectionText))})
         }
-    })
+    });
 }
 
 function removeMenu(name) {
