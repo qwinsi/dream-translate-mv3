@@ -648,34 +648,82 @@ export function httpPost(options) {
         headers: [],
     }, options)
     return new Promise((resolve, reject) => {
-        let c = new XMLHttpRequest()
-        c.responseType = o.responseType
-        c.timeout = o.timeout
-        c.onload = function (e) {
-            if (this.status === 200 && this.response !== null) {
-                resolve(this.response)
+        // let c = new XMLHttpRequest()
+        // c.responseType = o.responseType
+        // c.timeout = o.timeout
+        // c.onload = function (e) {
+        //     if (this.status === 200 && this.response !== null) {
+        //         resolve(this.response)
+        //     } else {
+        //         reject(e)
+        //     }
+        // }
+        // c.ontimeout = function (e) {
+        //     reject(e)
+        // }
+        // c.onerror = function (e) {
+        //     reject(e)
+        // }
+        // c.open("POST", o.url)
+        // if (o.type === 'form') {
+        //     c.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+        // } else if (o.type === 'json') {
+        //     c.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+        // } else if (o.type === 'xml') {
+        //     c.setRequestHeader("Content-Type", "application/ssml+xml")
+        // }
+        // o.headers.length > 0 && o.headers.forEach(v => {
+        //     c.setRequestHeader(v.name, v.value)
+        // })
+        // c.send(o.body)
+
+        let content_type;
+        switch (o.type) {
+            case 'form':
+                content_type = "application/x-www-form-urlencoded; charset=UTF-8";
+                break;
+            case 'json':
+                content_type = "application/json; charset=UTF-8";
+                break;
+            case 'xml':
+                content_type = "application/ssml+xml";
+                break;
+            default:
+                content_type = "application/x-www-form-urlencoded; charset=UTF-8";
+        }
+
+        const headers = new Headers();
+        headers.append('Content-Type', content_type);
+        if(o.headers.length > 0) {
+            o.headers.forEach(v => {
+                headers.append(v.name, v.value);
+            });
+        }
+
+        fetch(o.url, {
+            method: 'POST',
+            headers: headers,
+            body: o.body
+        }).then(async response => {
+            if (response.ok) {
+                if (o.responseType === 'json') {
+                    return response.json();
+                } else if (o.responseType === 'document') {
+                    throw new Error('Response with document type is not supported.');
+                } else {
+                    return response.text();
+                }
             } else {
-                reject(e)
+                throw new Error('Network response was not ok.');
             }
-        }
-        c.ontimeout = function (e) {
-            reject(e)
-        }
-        c.onerror = function (e) {
-            reject(e)
-        }
-        c.open("POST", o.url)
-        if (o.type === 'form') {
-            c.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-        } else if (o.type === 'json') {
-            c.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
-        } else if (o.type === 'xml') {
-            c.setRequestHeader("Content-Type", "application/ssml+xml")
-        }
-        o.headers.length > 0 && o.headers.forEach(v => {
-            c.setRequestHeader(v.name, v.value)
-        })
-        c.send(o.body)
+        }).then(data => {
+            resolve(data);
+        }).catch(err => {
+            if (isDebug) {
+                console.error("[httpPost]", err)
+            }
+            reject(err);
+        });
     })
 }
 
