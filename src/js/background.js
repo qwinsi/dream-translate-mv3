@@ -3,7 +3,7 @@ import { idb, initFavorite, initHistory } from "./db";
 import {
     isFirefox, B, storageLocalSet, debug, storageSyncGet, getSearchList, uniqueArray, storageShowAll,
     sendTabMessage, getActiveTabId, getJSONValue, execCopy, sandFgMessage, httpPost, httpGet,
-    getTimestamp, storageSyncSet, sleep, _setTimeout
+    getTimestamp, storageSyncSet, sleep, _setTimeout, storageLocalGet
 } from "./common";
 
 /**
@@ -46,7 +46,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     })
 
     // 最大保存历史记录数
-    if (localStorage['historyMax']) historyMax = Number(localStorage['historyMax'])
+    // if (localStorage['historyMax']) historyMax = Number(localStorage['historyMax'])
+    storageLocalGet(['historyMax']).then(r => {
+        if (r.historyMax) historyMax = r.historyMax;
+    });
 
     // 加载 js
     loadJs(uniqueArray(Object.keys(conf.translateList).concat(Object.keys(conf.translateTTSList))), 'translate')
@@ -468,7 +471,8 @@ function createHistory(m) {
 // 历史记录设置
 function settingHistory(n) {
     historyMax = Number(n)
-    localStorage.setItem('historyMax', n)
+    // localStorage.setItem('historyMax', n)
+    storageLocalSet({historyMax: historyMax})
 }
 
 function minCss(s) {
