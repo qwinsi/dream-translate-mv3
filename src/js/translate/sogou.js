@@ -1,5 +1,3 @@
-import { httpGet, debug, getJSONValue, isString, isObject, isArray } from "../common";
-
 /**
  * Dream Translate
  * https://github.com/ryanker/dream_translate
