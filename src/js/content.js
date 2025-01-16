@@ -768,7 +768,7 @@ function resultTranslate(name, isBilingual) {
         }
     })
     if (extra) s += extra // 重点词汇 && 单词含义
-    if (!s) s = '网络错误，请稍后再试'
+    if (!s) s = '......' // '网络错误，请稍后再试'
     el.querySelector('.case_content').innerHTML = s
 
     // 绑定点击搜索
