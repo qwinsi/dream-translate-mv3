@@ -1,3 +1,5 @@
+import { getJSONValue, isString, isObject, isArray, invertObject, sliceStr } from "../common";
+
 /**
  * Dream Translate
  * https://github.com/ryanker/dream_translate
@@ -5,7 +7,7 @@
  * @license MIT License
  */
 
-function sogouTranslate() {
+export function sogouTranslate() {
     return {
         langMap: {
             "auto": "auto",
@@ -136,6 +138,8 @@ function sogouTranslate() {
                 }
             })
         },*/
+
+        /* This method is replaced by parse()
         trans(q, srcLan, tarLan) {
             srcLan = this.langMap[srcLan] || 'auto'
             tarLan = this.langMap[tarLan] || 'zh-CHS'
@@ -143,8 +147,8 @@ function sogouTranslate() {
                 if (q.length > 5000) return reject('The text is too large!')
 
                 let url = `https://fanyi.sogou.com/?keyword=${encodeURI(q)}&transfrom=${srcLan}&transto=${tarLan}&model=general`
-                let pageId = 'fy_soGou'
-                openIframe(pageId, url, 60 * 1000)
+                // let pageId = 'fy_soGou'
+                // openIframe(pageId, url, 60 * 1000)
                 httpGet(url, 'document').then(r => {
                     // 获取翻译结果
                     let data
@@ -160,7 +164,7 @@ function sogouTranslate() {
                             data = JSON.parse(arr[1])
                             if (data) break
                         } catch (e) {
-                            debug('json error!')
+                            // debug('json error!')
                             return reject('JSON.parse Error!')
                         }
                     }
@@ -174,7 +178,8 @@ function sogouTranslate() {
                 })
             })
         },
-        unify(r, text, srcLan, tarLan) {
+        */
+        unify(r, text, srcLan, tarLan, setting) {
             // console.log('sogou:', r, text, srcLan, tarLan)
             // console.log(JSON.stringify(r))
             // 修正改版 2021.1.8
@@ -285,7 +290,8 @@ function sogouTranslate() {
             return {text, srcLan, tarLan, lanTTS: null, data, extra: s}
         },
         async query(q, srcLan, tarLan) {
-            return checkRetry(() => this.trans(q, srcLan, tarLan), 2)
+            throw new Error('[sogouTranslate.query] Should not use this method in content script');
+            // return checkRetry(() => this.trans(q, srcLan, tarLan), 2)
         },
         tts(q, lan) {
             lan = this.langMap[lan] || 'en'
@@ -306,7 +312,42 @@ function sogouTranslate() {
             tarLan = this.langMap[tarLan] || 'zh-CHS'
             return `https://fanyi.sogou.com/?keyword=${encodeURI(q)}&transfrom=${srcLan}&transto=${tarLan}&model=general`
         },
+        fetch(q, srcLan, tarLan) {
+            if (q.length > 5000) throw new Error('[sogou translate] The text is too large!');
+            const url = this.link(q, srcLan, tarLan);
+            return fetch(url).then(r => r.text());
+        },
+        parse(html, q, srcLan, tarLan, setting) {
+            srcLan = this.langMap[srcLan] || 'auto'
+            tarLan = this.langMap[tarLan] || 'zh-CHS'
+
+            const get_json = function(html) {
+                let data;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                let sEl = doc.querySelectorAll('script')
+                for (let i = 0; i < sEl.length; i++) {
+                    let el = sEl[i]
+                    if (el.getAttribute('src')) continue
+                    let s = el.textContent
+                    if (!s) continue
+                    let arr = s.match(/window\.__INITIAL_STATE__=(.*?);\(function\(\){var s;/m)
+                    if (!arr || arr.length < 2) continue
+                    try {
+                        data = JSON.parse(arr[1])
+                        if (data) break
+                    } catch (e) {
+                        throw new Error('JSON.parse Error!')
+                    }
+                }
+                if(data) {
+                    return data;
+                } else {
+                    throw new Error('Get data is empty!')
+                }
+            }
+            const data = get_json(html);
+            return this.unify(data, q, srcLan, tarLan, setting);
+        }
     }
 }
-
-window.sogouTranslate = sogouTranslate;

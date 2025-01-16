@@ -5,6 +5,7 @@ import {
     sendTabMessage, getActiveTabId, getJSONValue, execCopy, sandFgMessage, httpPost, httpGet,
     getTimestamp, storageSyncSet, sleep, _setTimeout, storageLocalGet
 } from "./common";
+import { sogouTranslate } from "./translate/sogou";
 
 // Using `window` globals in ManifestV3 service worker background script - Stack Overflow
 // https://stackoverflow.com/questions/73778202/
@@ -170,6 +171,9 @@ B.commands.onCommand.addListener(function (command) {
     }
 })
 
+const sogou_translate = sogouTranslate();
+sogou_translate.init();
+
 async function runTranslate(tabId, m) {
     let {action, text, srcLan, tarLan} = m
     if (srcLan === 'auto') {
@@ -180,6 +184,25 @@ async function runTranslate(tabId, m) {
         if (srcLan === tarLan) tarLan = srcLan === 'zh' ? 'en' : 'zh'
     }
     setting.translateList.forEach(name => {
+        if(name === 'sogou') {
+            sogou_translate.fetch(text, srcLan, tarLan).then(html => {
+                const incomplete_result = { text, srcLan, tarLan, langTTS: null };
+                const settings_to_parser = {
+                    translateThin: setting.translateThin,
+                };
+                sandFgMessage(tabId, {
+                    action,
+                    name,
+                    html,
+                    diy: true,
+                    result: incomplete_result,
+                    setting: settings_to_parser,
+                });
+            });
+
+            const link = sogou_translate.link(text, srcLan, tarLan);
+            sandFgMessage(tabId, {action: 'link', type: action, name, link});
+        }
         sdkInit(`${name}Translate`).then(sd => {
             sd.query(text, srcLan, tarLan).then(result => {
                 debug(`${name}:`, result)
@@ -218,8 +241,8 @@ function runDictionary(tabId, m) {
     setting.dictionaryList.forEach(name => {
         if(name === 'youdao') {
             const url = `https://www.youdao.com/w/eng/${encodeURIComponent(text)}`;
-            httpGet(url, 'text').then(html => {
-                sandFgMessage(tabId, {action, name, html});
+            fetch(url).then(r => r.text()).then(html => {
+                sandFgMessage(tabId, {action, name, html, diy: true});
             });
             sandFgMessage(tabId, {action: 'link', type: action, name, link: url, text});
             return;
@@ -699,8 +722,8 @@ function sdkInit(name) {
 // Unfortunately, calling importScripts() inside a function is not allowed.
 // So just load all needed scripts manually here.
 // https://stackoverflow.com/questions/36251929/how-to-load-javascript-file-in-a-service-worker-dynamically
-importScripts('translate/sogou.js');
-importScripts('translate/youdao.js');
+// importScripts('translate/sogou.js');
+// importScripts('translate/youdao.js');
 // importScripts('dictionary/youdao.js');
 
 // load sogou.js etc.
@@ -717,13 +740,6 @@ function loadJs(arr, type) {
     })
 }
 
-function invertObject(obj) {
-    let r = {}
-    for (const [key, value] of Object.entries(obj)) {
-        r[value] = key
-    }
-    return r
-}
 
 // 清理元素属性
 function cleanAttr(el, attrs) {
@@ -737,22 +753,6 @@ function cleanAttr(el, attrs) {
             }
         }
     })
-}
-
-// 检测返回结果是否正确，如果不正确，则重试
-async function checkRetry(callback, times) {
-    times = times || 3 // 默认 3 次
-    let isOk = false
-    let p
-    for (let i = 0; i < times; i++) {
-        p = callback(i)
-        await p.then(r => {
-            if (r.data && r.data.length > 0) isOk = true
-        }).catch(_ => null)
-        if (isOk) return p
-        await sleep(300)
-    }
-    return p
 }
 
 /*function openBgPage(id, url, timeout) {
@@ -823,25 +823,6 @@ function reloadTmpTab(id) {
     if (tabId) B.tabs.reload(tabId, {bypassCache: true}, () => B.runtime.lastError) // 重新加载
 }
 
-function openIframe(id, url, timeout) {
-    timeout = timeout || 20 * 1000 // 默认 20 秒
-    let ifrId = `_iframe_${id || 'one'}`
-    let el = document.getElementById(ifrId)
-    if (!el) {
-        el = document.createElement('iframe')
-        el.id = ifrId
-        // @ts-ignore
-        el.src = url
-        document.body.appendChild(el)
-    } else {
-        // @ts-ignore
-        el.src = url
-    }
-
-    // 定时删除，减小内存占用
-    _setTimeout(id, () => el && el.remove(), timeout)
-    return el
-}
 
 function removeIframe(id) {
     let ifrId = `_iframe_${id || 'one'}`
@@ -849,79 +830,14 @@ function removeIframe(id) {
     el && el.remove()
 }
 
-function sliceStr(text, maxLen) {
-    let r = []
-    if (text.length <= maxLen) {
-        r.push(text)
-    } else {
-        // 根据优先级截取字符串，详细符号见：https://zh.wikipedia.org/wiki/%E6%A0%87%E7%82%B9%E7%AC%A6%E5%8F%B7
-        let separators = `?!;.-…,/"`
-        separators += `？！；。－－＿～﹏·，：、`
-        separators += `“”﹃﹄「」﹁﹂『』﹃﹄（）［］〔〕【】《》〈〉()[]{}`
-        let separatorArr = [...separators]
-        let arr = text.split('\n')
-        arr.forEach(s => {
-            s = s.trim()
-            if (!s) return
 
-            if (s.length <= maxLen) {
-                r.push(s)
-            } else {
-                do {
-                    if (s.length <= maxLen) {
-                        r.push(s)
-                        break
-                    }
-                    let end = false
-                    for (let i = 0; i < separatorArr.length; i++) {
-                        if (i + 1 === separatorArr.length) end = true
-                        let symbol = separatorArr[i]
-                        let n = s.indexOf(symbol)
-                        if (n === -1) continue
-                        if (n > maxLen) continue
-                        let s2 = s.substring(0, n).trim()
-                        s2 && r.push(s2)
-                        s = s.substring(n + 1).trim()
-                        break
-                    }
-                    if (!end) continue
-                    if (!s) break
-                    if (s.length <= maxLen) {
-                        r.push(s)
-                        break
-                    }
-
-                    let s1 = s.substring(0, maxLen)
-                    let s2 = s.substring(maxLen)
-                    let n = s1.lastIndexOf(' ')
-                    if (n !== -1) {
-                        // 处理英文
-                        let s3 = s1.substring(0, n)
-                        let s4 = s1.substring(n)
-                        r.push(s3)
-                        s = (s4 + s2).trim()
-                    } else {
-                        // 没有空格，就硬切（这种情况一般是中文）
-                        r.push(s1)
-                        s = s2
-                    }
-                } while (s)
-            }
-        })
-    }
-    return r
-}
 
 window.textTmp = textTmp
 window.setting = setting;
-window.invertObject = invertObject;
 window.cleanAttr = cleanAttr;
-window.checkRetry = checkRetry;
 window.createTmpTab = createTmpTab;
 window.removeTmpTab = removeTmpTab;
 window.reloadTmpTab = reloadTmpTab;
-window.openFrame = openIframe;
 window.removeFrame = removeIframe;
-window.sliceStr = sliceStr;
 
 void main();

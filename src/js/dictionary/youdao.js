@@ -93,6 +93,7 @@ export function youdaoDictionary() {
         },
         query(q) {
             throw new Error('[youdaoDictionary.query] Should not use this method in content script');
+            /*
             return new Promise((resolve, reject) => {
                 // if (q.length > 100) return reject('The text is too large!')
                 let url = `https://www.youdao.com/w/eng/${encodeURIComponent(q)}`
@@ -106,6 +107,12 @@ export function youdaoDictionary() {
                     reject(e)
                 })
             })
+            */
+        },
+        fetch(q) {
+            if (q.length > 100) throw new Error('The text is too large!');
+            const url = this.link(q);
+            return fetch(url).then(r => r.text());
         },
         parse(html, q) {
             const parser = new DOMParser();

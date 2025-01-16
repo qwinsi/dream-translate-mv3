@@ -4,6 +4,7 @@ import {
     getTimestamp
 } from './common';
 import { youdaoDictionary } from './dictionary/youdao';
+import { sogouTranslate } from './translate/sogou';
 
 /**
  * Dream Translate
@@ -61,12 +62,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     storageShowAll()
 })
 
+const sogou_translate = sogouTranslate();
+sogou_translate.init();
+
 // 监听消息
 B.onMessage.addListener(function (m, sender, sendResponse) {
     sendResponse()
     debug('request:', m)
     // debug('sender:', sender)
     if (m.action === 'translate') {
+        if(m.diy && m.name === 'sogou') {
+            if(!m.html) {
+                console.error("bad m: ", m);
+                throw new Error('[before resultTranslate] Expecting HTML in message, but m.html is undefined.')
+            }
+            const {text, srcLan, tarLan} = m.result;
+            m.result = sogou_translate.parse(m.html, text, srcLan, tarLan, m.setting);
+        }
         msgList[m.name] = m.result
         resultTranslate(m.name)
     } else if (m.action === 'dictionary') {
@@ -761,15 +773,14 @@ function resultTranslate(name, isBilingual) {
 
 const youdao_dict = youdaoDictionary();
 function resultDictionary(m) {
-    let {name, result, error} = m
-
-    if(name === 'youdao') {
+    if(m.diy && m.name === 'youdao') {
         if(!m.html) {
-            throw new Error('Expecting HTML in message, but m.html is undefined')
+            throw new Error('[resultDictionary] Expecting HTML in message, but m.html is undefined')
         }
-        result = youdao_dict.parse(m.html, m.text);
+        m.result = youdao_dict.parse(m.html, m.text);
     }
 
+    let {name, result, error} = m
     let el = I(`${name}_dictionary_case`)
     if (!el) return
     let cEl = el.querySelector('.case_content')

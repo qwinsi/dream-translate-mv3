@@ -704,3 +704,111 @@ export function encodeURI(s) {
 export function debug(...data) {
     isDebug && console.log('[DMX DEBUG]', ...data)
 }
+
+export function openIframe(id, url, timeout) {
+    timeout = timeout || 20 * 1000 // 默认 20 秒
+    let ifrId = `_iframe_${id || 'one'}`
+    let el = document.getElementById(ifrId)
+    if (!el) {
+        el = document.createElement('iframe')
+        el.id = ifrId
+        // @ts-ignore
+        el.src = url
+        document.body.appendChild(el)
+    } else {
+        // @ts-ignore
+        el.src = url
+    }
+
+    // 定时删除，减小内存占用
+    _setTimeout(id, () => el && el.remove(), timeout)
+    return el
+}
+
+
+// 检测返回结果是否正确，如果不正确，则重试
+export async function checkRetry(callback, times) {
+    times = times || 3 // 默认 3 次
+    let isOk = false
+    let p
+    for (let i = 0; i < times; i++) {
+        p = callback(i)
+        await p.then(r => {
+            if (r.data && r.data.length > 0) isOk = true
+        }).catch(_ => null)
+        if (isOk) return p
+        await sleep(300)
+    }
+    return p
+}
+
+export function invertObject(obj) {
+    let r = {}
+    for (const [key, value] of Object.entries(obj)) {
+        r[value] = key
+    }
+    return r
+}
+
+export function sliceStr(text, maxLen) {
+    let r = []
+    if (text.length <= maxLen) {
+        r.push(text)
+    } else {
+        // 根据优先级截取字符串，详细符号见：https://zh.wikipedia.org/wiki/%E6%A0%87%E7%82%B9%E7%AC%A6%E5%8F%B7
+        let separators = `?!;.-…,/"`
+        separators += `？！；。－－＿～﹏·，：、`
+        separators += `“”﹃﹄「」﹁﹂『』﹃﹄（）［］〔〕【】《》〈〉()[]{}`
+        let separatorArr = [...separators]
+        let arr = text.split('\n')
+        arr.forEach(s => {
+            s = s.trim()
+            if (!s) return
+
+            if (s.length <= maxLen) {
+                r.push(s)
+            } else {
+                do {
+                    if (s.length <= maxLen) {
+                        r.push(s)
+                        break
+                    }
+                    let end = false
+                    for (let i = 0; i < separatorArr.length; i++) {
+                        if (i + 1 === separatorArr.length) end = true
+                        let symbol = separatorArr[i]
+                        let n = s.indexOf(symbol)
+                        if (n === -1) continue
+                        if (n > maxLen) continue
+                        let s2 = s.substring(0, n).trim()
+                        s2 && r.push(s2)
+                        s = s.substring(n + 1).trim()
+                        break
+                    }
+                    if (!end) continue
+                    if (!s) break
+                    if (s.length <= maxLen) {
+                        r.push(s)
+                        break
+                    }
+
+                    let s1 = s.substring(0, maxLen)
+                    let s2 = s.substring(maxLen)
+                    let n = s1.lastIndexOf(' ')
+                    if (n !== -1) {
+                        // 处理英文
+                        let s3 = s1.substring(0, n)
+                        let s4 = s1.substring(n)
+                        r.push(s3)
+                        s = (s4 + s2).trim()
+                    } else {
+                        // 没有空格，就硬切（这种情况一般是中文）
+                        r.push(s1)
+                        s = s2
+                    }
+                } while (s)
+            }
+        })
+    }
+    return r
+}
