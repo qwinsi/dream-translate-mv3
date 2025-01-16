@@ -462,10 +462,5 @@ function clearSetting() {
 }
 
 function sendSetting(setting, updateIcon, resetDialog) {
-    if (B.getBackgroundPage) {
-        B.getBackgroundPage().saveSettingAll(setting, updateIcon, resetDialog)
-    } else {
-        // firefox 在 iframe 下功能缺失，所以通过 message 处理
-        sendMessage({action: 'saveSetting', setting, updateIcon, resetDialog})
-    }
+    sendMessage({action: 'saveSetting', setting, updateIcon, resetDialog})
 }

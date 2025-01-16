@@ -1,9 +1,10 @@
 {
   "name": "dream-translator",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
-    "build": "bun build --entrypoints src/js/background.js src/js/content.js --outdir ./dist/js"
+    "build": "bun build --entrypoints src/js/background.js src/js/content.js --outdir ./dist/js && node tool/remove-export.js"
   },
   "devDependencies": {
     "eslint": "^9.18.0",
