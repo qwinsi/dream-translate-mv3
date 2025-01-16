@@ -158,12 +158,25 @@ export function sendTabMessage(tabId, message) {
 
 export function sandFgMessage(id, message) {
     if (id === 'popup') {
-        let popup = B.extension.getViews({type: 'popup'})
-        if (popup.length > 0) {
-            return sendMessage(message)
-        } else {
-            return Promise.resolve()
-        }
+        // let popup = B.extension.getViews({type: 'popup'})
+        // if (popup.length > 0) {
+            // return sendMessage(message)
+        // } else {
+            // return Promise.resolve()
+        // }
+
+        // chrome.extension.getViews is deprecated. Use chrome.runtime.getContexts instead.
+        // function getContexts(filter): Promise<context[]>
+
+        return new Promise((resolve, reject) => {
+            B.runtime.getContexts({contextTypes: ['POPUP']}).then(contexts => {
+                if (contexts.length > 0) {
+                    sendMessage(message).then(r => resolve(r), err => reject(err))
+                } else {
+                    resolve()
+                }
+            });
+        });
     } else {
         return sendTabMessage(id, message)
     }

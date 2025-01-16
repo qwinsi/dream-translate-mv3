@@ -64,7 +64,7 @@
   ],
   "homepage_url": "https://github.com/qwinsi/dream-translator",
   "commands": {
-    "_execute_browser_action": {
+    "_execute_action": {
       "description": "打开翻译面板",
       "suggested_key": {
         "default": "Alt+D"

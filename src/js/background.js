@@ -110,7 +110,6 @@ B.contextMenus.onClicked.addListener(function (info, tab) {
 
 // 监听消息
 B.onMessage.addListener(function (m, sender, sendResponse) {
-    sendResponse()
     debug('request:', m)
     debug('sender:', sender && sender.url ? sender.url : sender)
     let tabId = getJSONValue(sender, 'tab.id')
@@ -149,7 +148,15 @@ B.onMessage.addListener(function (m, sender, sendResponse) {
         getOcrText(tabId, m.base64).catch()
     } else if (m.action === 'textTmp') {
         textTmp = m.text // 划词文字缓存
+    } else if (m.action === 'getTextTmp') {
+        console.log("textTmp in background.js: ", textTmp);
+        sendResponse(textTmp);
+        return; // don't call sendResponse() again
+    } else {
+        console.error('[background.js onMessage] bad m: ' + m);
+        throw new Error('[background.js onMessage] Unknown action: ' + m.action);
     }
+    sendResponse();
 })
 
 // 监听快捷键

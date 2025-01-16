@@ -214,7 +214,11 @@ function initDialog() {
         addClass(dialog.el, 'dmx_popup')
         isFullscreen ? addClass(dialog.el, 'fullscreen') : addClass(document.documentElement, 'dmx_popup')
         A('#dmx_close,#dmx_pin,#dmx_fullscreen').forEach(e => e.remove())
-        if (B.getBackgroundPage) textTmp = B.getBackgroundPage().textTmp // 读取后台缓存
+        // if (B.getBackgroundPage) textTmp = B.getBackgroundPage().textTmp // 读取后台缓存
+        sendBgMessage({action: 'getTextTmp'}).then(r => {
+            console.log('getTextTmp:', r)
+            textTmp = r;
+        });
     }
 
     // 划词查询
@@ -1193,8 +1197,8 @@ function sendPlaySound(nav, name, type, url) {
 
 function sendBgMessage(message) {
     return new Promise((resolve, reject) => {
-        sendMessage(message).then(_ => {
-            resolve()
+        sendMessage(message).then(r => {
+            resolve(r)
         }).catch(err => {
             // 减少错误提示框
             if (getTimestamp() > (window.dmxUpdateDate || 0)) {
