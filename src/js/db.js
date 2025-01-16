@@ -9,7 +9,7 @@
 
 export function idb(dbName, version, onupgradeneeded) {
     return new Promise((resolve, reject) => {
-        let req = window.indexedDB.open(dbName, version)
+        let req = indexedDB.open(dbName, version)
         req.onupgradeneeded = onupgradeneeded // 首次创建或更高版本号时执行
         req.onerror = (e) => reject(e)
         req.onsuccess = () => {
@@ -125,7 +125,7 @@ export function idb(dbName, version, onupgradeneeded) {
 
 function rmIdb(dbName) {
     return new Promise((resolve, reject) => {
-        let db = window.indexedDB.deleteDatabase(dbName)
+        let db = indexedDB.deleteDatabase(dbName)
         db.onsuccess = (e) => resolve(e)
         db.onerror = (e) => reject(e)
         setTimeout(_ => reject('time out'), 2000)
