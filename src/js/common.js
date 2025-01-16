@@ -583,33 +583,58 @@ export function uniqueArray(arr) {
     return [...new Set(arr)]
 }
 
+// type: 'json' | 'text'. Throw error if type='document'
 export function httpGet(url, type, headers, notStrict) {
     return new Promise((resolve, reject) => {
-        let c = new XMLHttpRequest()
-        c.responseType = type || 'text'
-        c.timeout = 20000
-        c.onload = function (e) {
-            if (notStrict) {
-                resolve(this.response)
-            } else {
-                if (this.status === 200) {
-                    resolve(this.response)
+        // let c = new XMLHttpRequest()
+        // c.responseType = type || 'text'
+        // c.timeout = 20000
+        // c.onload = function (e) {
+        //     if (notStrict) {
+        //         resolve(this.response)
+        //     } else {
+        //         if (this.status === 200) {
+        //             resolve(this.response)
+        //         } else {
+        //             reject(e)
+        //         }
+        //     }
+        // }
+        // c.ontimeout = function (e) {
+        //     reject(e)
+        // }
+        // c.onerror = function (e) {
+        //     reject(e)
+        // }
+        // c.open("GET", url)
+        // headers && headers.forEach(v => {
+        //     c.setRequestHeader(v.name, v.value)
+        // })
+        // c.send()
+        fetch(url, {
+            method: 'GET',
+            headers: headers
+        }).then(async response => {
+            console.log("[httpGet] response:", response)
+            if (response.ok || notStrict) {
+                if (type === 'json') {
+                    return response.json();
+                } else if (type === 'document') {
+                    throw new Error('Response with document type is not supported.');
                 } else {
-                    reject(e)
+                    return response.text();
                 }
+            } else {
+                throw new Error('Network response was not ok.');
             }
-        }
-        c.ontimeout = function (e) {
-            reject(e)
-        }
-        c.onerror = function (e) {
-            reject(e)
-        }
-        c.open("GET", url)
-        headers && headers.forEach(v => {
-            c.setRequestHeader(v.name, v.value)
-        })
-        c.send()
+        }).then(data => {
+            resolve(data);
+        }).catch(err => {
+            if (isDebug) {
+                console.error("[httpGet]", err)
+            }
+            reject(err);
+        });
     })
 }
 

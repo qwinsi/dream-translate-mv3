@@ -7,7 +7,7 @@
  * @license MIT License
  */
 
-function youdaoDictionary() {
+export function youdaoDictionary() {
     return {
         init() {
             return this
@@ -92,6 +92,7 @@ function youdaoDictionary() {
             return {text, phonetic, sound, html: s}
         },
         query(q) {
+            throw new Error('[youdaoDictionary.query] Should not use this method in content script');
             return new Promise((resolve, reject) => {
                 // if (q.length > 100) return reject('The text is too large!')
                 let url = `https://www.youdao.com/w/eng/${encodeURIComponent(q)}`
@@ -105,6 +106,11 @@ function youdaoDictionary() {
                     reject(e)
                 })
             })
+        },
+        parse(html, q) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            return this.unify(doc, q)
         },
         link(q) {
             return `https://www.youdao.com/w/eng/${encodeURIComponent(q)}`

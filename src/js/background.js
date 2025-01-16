@@ -216,6 +216,14 @@ function runDictionary(tabId, m) {
     let {action, text} = m
     window.dictionarySounds = {} // 返回的发音缓存
     setting.dictionaryList.forEach(name => {
+        if(name === 'youdao') {
+            const url = `https://www.youdao.com/w/eng/${encodeURIComponent(text)}`;
+            httpGet(url, 'text').then(html => {
+                sandFgMessage(tabId, {action, name, html});
+            });
+            sandFgMessage(tabId, {action: 'link', type: action, name, link: url, text});
+            return;
+        }
         sdkInit(`${name}Dictionary`).then(sd => {
             sd.query(text).then(result => {
                 debug(`${name}:`, result)
@@ -693,7 +701,7 @@ function sdkInit(name) {
 // https://stackoverflow.com/questions/36251929/how-to-load-javascript-file-in-a-service-worker-dynamically
 importScripts('translate/sogou.js');
 importScripts('translate/youdao.js');
-importScripts('dictionary/youdao.js');
+// importScripts('dictionary/youdao.js');
 
 // load sogou.js etc.
 function loadJs(arr, type) {

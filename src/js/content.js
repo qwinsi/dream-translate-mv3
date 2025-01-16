@@ -3,6 +3,7 @@ import {
     rmClass, hasClass, getSearchList, onD, execCopy, inArray, execPaste, isArray, storageSyncSet,
     getTimestamp
 } from './common';
+import { youdaoDictionary } from './dictionary/youdao';
 
 /**
  * Dream Translate
@@ -758,8 +759,17 @@ function resultTranslate(name, isBilingual) {
     resultBindEvent(el, 'translate', name)
 }
 
+const youdao_dict = youdaoDictionary();
 function resultDictionary(m) {
     let {name, result, error} = m
+
+    if(name === 'youdao') {
+        if(!m.html) {
+            throw new Error('Expecting HTML in message, but m.html is undefined')
+        }
+        result = youdao_dict.parse(m.html, m.text);
+    }
+
     let el = I(`${name}_dictionary_case`)
     if (!el) return
     let cEl = el.querySelector('.case_content')
