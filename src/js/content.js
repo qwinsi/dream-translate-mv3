@@ -292,6 +292,20 @@ function initDialog() {
         if (setting.autoWords && setting.scribble !== 'off') _setTimeout('_mouseWords', () => mouseWords(e), 300)
     })
 
+    // keyboard shortcut
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            // if dialog is shown, close it
+            if (dialog.el.style.display === 'block') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                dialog.hide();
+                rmClass(document.documentElement, 'dmx_overflow_hidden');
+            }
+        }
+    })
+
     // 历史记录
     let hEl = shadow_root.getElementById('dmx_history')
     let hlEl = hEl.querySelector('.dmx-icon-left')
