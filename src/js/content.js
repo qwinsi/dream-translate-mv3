@@ -15,7 +15,7 @@ import { sogouTranslate } from './translate/sogou';
 
 let isPopup = window.isPopup
 let isFullscreen, isClipboardRead, isSome
-let dialog, shadow,
+let dialog, shadow_root,
     setting, conf, dialogConf,
     languageList, dialogCSS = '', dictionaryCSS = {},
     iconBut, iconText,
@@ -26,7 +26,7 @@ let textTmp = ''
 let queryHistory = [], historyIndex = 0, disHistory = false
 let searchText
 document.addEventListener('DOMContentLoaded', async function () {
-    let u = new URL(location.href)
+    let u = new URL(location.href);
     isFullscreen = u.searchParams.get('fullscreen') === '1'
     isClipboardRead = u.searchParams.get('clipboardRead') === '1'
     isSome = location.href.indexOf(root) === 0
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         bindDragEvent();
     }
 
-    // 查看全部数据
+    // 查看全部数据, debug-only
     storageShowAll()
 })
 
@@ -207,13 +207,13 @@ function initDialog() {
     })
 
     // 影子元素
-    shadow = dialog.shadow
+    shadow_root = dialog.shadow
 
     // 小屏窗口
     if (isPopup) {
         addClass(dialog.el, 'dmx_popup')
         isFullscreen ? addClass(dialog.el, 'fullscreen') : addClass(document.documentElement, 'dmx_popup')
-        A('#dmx_close,#dmx_pin,#dmx_fullscreen').forEach(e => e.remove())
+        shadow_root.querySelectorAll('#dmx_close,#dmx_pin,#dmx_fullscreen').forEach(e => e.remove())
         // if (B.getBackgroundPage) textTmp = B.getBackgroundPage().textTmp // 读取后台缓存
         sendBgMessage({action: 'getTextTmp'}).then(r => {
             console.log('getTextTmp:', r)
@@ -228,7 +228,7 @@ function initDialog() {
     })
 
     // 鼠标图标
-    iconBut = I('dmx_mouse_icon')
+    iconBut = shadow_root.getElementById('dmx_mouse_icon')
     iconBut.onclick = function (e) {
         iconBut.style.display = 'none'
         sendQuery(iconText)  // 点击图标查询
@@ -239,7 +239,7 @@ function initDialog() {
     }
 
     // 绑定事件
-    let nav = I('dmx_navigate')
+    let nav = shadow_root.getElementById('dmx_navigate')
     let uEl = nav.querySelectorAll('u')
     uEl.forEach(e => {
         e.addEventListener('click', function () {
@@ -269,21 +269,21 @@ function initDialog() {
     }
 
     // 设置按钮
-    I('dmx_setting').addEventListener('click', function () {
+    shadow_root.getElementById('dmx_setting').addEventListener('click', function () {
         rmClassD(uEl, 'active')
         initSetting()
         dQuery.action = 'setting'
     })
 
     // 更多功能
-    I('dmx_more').addEventListener('click', function () {
+    shadow_root.getElementById('dmx_more').addEventListener('click', function () {
         rmClassD(uEl, 'active')
         initMore()
         dQuery.action = 'more'
     })
 
     // 录音练习
-    I('dmx_voice').addEventListener('click', function () {
+    shadow_root.getElementById('dmx_voice').addEventListener('click', function () {
         sendMessage({action: 'onRecord'})
     })
 
@@ -293,7 +293,7 @@ function initDialog() {
     })
 
     // 历史记录
-    let hEl = I('dmx_history')
+    let hEl = shadow_root.getElementById('dmx_history')
     let hlEl = hEl.querySelector('.dmx-icon-left')
     let hrEl = hEl.querySelector('.dmx-icon-right')
     let loadHistory = function (index) {
@@ -352,15 +352,15 @@ function initTranslate() {
 <div id="case_list" class="dmx_main fx"></div>`)
 
     // 绑定事件
-    let sourceEl = I('language_source')
-    let targetEl = I('language_target')
-    let exchangeEl = I('language_exchange')
-    let inputEl = I('translate_input')
-    let translateEl = I('translate_button')
-    let cropEl = I('translate_crop')
-    let dropdownEl = I('language_dropdown')
+    let sourceEl = shadow_root.getElementById('language_source')
+    let targetEl = shadow_root.getElementById('language_target')
+    let exchangeEl = shadow_root.getElementById('language_exchange')
+    let inputEl = shadow_root.getElementById('translate_input')
+    let translateEl = shadow_root.getElementById('translate_button')
+    let cropEl = shadow_root.getElementById('translate_crop')
+    let dropdownEl = shadow_root.getElementById('language_dropdown')
     let dropdownU = dropdownEl.querySelectorAll('u')
-    let contentEl = I('dmx_dialog_content')
+    let contentEl = shadow_root.getElementById('dmx_dialog_content')
     let tmpEl
     let onButton = function () {
         let el = this
@@ -485,7 +485,7 @@ function initTranslate() {
         if (!isPopup && !isFullscreen) { // 排除弹窗
             // translateEl.style.display = 'none'
             inputEl.style.display = 'none'
-            E('.dmx_main_trans').style.paddingTop = '0'
+            shadow_root.querySelector('.dmx_main_trans').style.paddingTop = '0'
         }
     }
 
@@ -512,9 +512,9 @@ function initDictionary() {
 </div>
 <div id="case_list" class="dmx_main dmx_content fx"></div>`)
 
-    let inpEl = I('dictionary_input')
-    let rmEl = I('search_remove')
-    let butEl = I('search_but')
+    let inpEl = shadow_root.getElementById('dictionary_input')
+    let rmEl = shadow_root.getElementById('search_remove')
+    let butEl = shadow_root.getElementById('search_but')
     rmEl.onclick = function () {
         inpEl.value = ''
         inpEl.focus()
@@ -543,15 +543,15 @@ function initSearch() {
 </div>
 <div id="case_list" class="dmx_main dmx_content dmx_main_search fx"></div>`)
 
-    let inpEl = I('search_input')
-    let rmEl = I('search_remove')
-    let butEl = I('search_but')
+    let inpEl = shadow_root.getElementById('search_input')
+    let rmEl = shadow_root.getElementById('search_remove')
+    let butEl = shadow_root.getElementById('search_but')
     rmEl.onclick = function () {
         inpEl.value = ''
         inpEl.focus()
     }
     butEl.onclick = function () {
-        let el = I('case_list').querySelector('[data-search]')
+        let el = shadow_root.getElementById('case_list').querySelector('[data-search]')
         if (el) el.click()
     }
     inpEl.addEventListener('change', function () {
@@ -569,14 +569,14 @@ function initSearch() {
     for (let name of sList) {
         if (cList[name]) s += `<div class="dmx_button" data-search="${name}">${name}</div>`
     }
-    I('case_list').innerHTML = s
+    shadow_root.getElementById('case_list').innerHTML = s
 
     // 绑定点击事件
-    onD(A('[data-search]'), 'click', function () {
+    onD(shadow_root.querySelectorAll('[data-search]'), 'click', function () {
         let name = this.dataset.search
         let url = cList[name]
         if (!url) return
-        let text = I('search_input').value.trim()
+        let text = shadow_root.getElementById('search_input').value.trim()
         if (text) {
             open(url.format(decodeURIComponent(text)))
         } else {
@@ -594,9 +594,9 @@ function initMore() {
 }
 
 function initDictionaryCSS() {
-    let styleEl = E('style')
+    let styleEl = shadow_root.querySelector('style')
     conf.dictionaryCSS.forEach(name => {
-        if (!setting.dictionaryList.includes(name) || !dictionaryCSS[name] || E(`style[data-name="${name}"]`)) return
+        if (!setting.dictionaryList.includes(name) || !dictionaryCSS[name] || shadow_root.querySelector(`style[data-name="${name}"]`)) return
         let s = `<style data-name="${name}">${dictionaryCSS[name]}</style>`
         styleEl.insertAdjacentHTML('afterend', s)
     })
@@ -604,8 +604,8 @@ function initDictionaryCSS() {
 
 function initCrop() {
     let startX = 0, startY = 0
-    let bgEl = I('dmx_crop_bg')
-    let fgEl = I('dmx_crop_fg')
+    let bgEl = shadow_root.getElementById('dmx_crop_bg')
+    let fgEl = shadow_root.getElementById('dmx_crop_fg')
     bgEl.style.display = 'block'
     let funDown = (e) => {
         startX = e.clientX
@@ -660,7 +660,7 @@ function initCrop() {
 }
 
 function loadingTranslate() {
-    let el = I('case_list')
+    let el = shadow_root.getElementById('case_list')
     let cList = conf.translateList
     let sList = setting.translateList
     if (sList.length < 1) {
@@ -686,7 +686,7 @@ function loadingTranslate() {
 
     // 绑定事件
     sList.forEach(name => {
-        let caseEl = I(`${name}_translate_case`)
+        let caseEl = shadow_root.getElementById(`${name}_translate_case`)
         let copyEl = caseEl.querySelector('.case_copy')
         let bilingualEl = caseEl.querySelector('.case_bilingual')
         let contentEl = caseEl.querySelector('.case_content')
@@ -708,7 +708,7 @@ function loadingTranslate() {
 }
 
 function loadingDictionary() {
-    let el = I('case_list')
+    let el = shadow_root.getElementById('case_list')
     let cList = conf.dictionaryList
     let sList = setting.dictionaryList
     if (sList.length < 1) {
@@ -732,7 +732,7 @@ function loadingDictionary() {
 }
 
 function resultTranslate(name, isBilingual) {
-    let el = I(`${name}_translate_case`)
+    let el = shadow_root.getElementById(`${name}_translate_case`)
     if (!el) return
     let {srcLan, tarLan, lanTTS, data, extra} = msgList[name] || {}
 
@@ -785,7 +785,7 @@ function resultDictionary(m) {
     }
 
     let {name, result, error} = m
-    let el = I(`${name}_dictionary_case`)
+    let el = shadow_root.getElementById(`${name}_dictionary_case`)
     if (!el) return
     let cEl = el.querySelector('.case_content')
     if (error) {
@@ -851,7 +851,7 @@ function resultBindEvent(el, nav, name) {
 }
 
 function resultLink(m) {
-    let el = I(`${m.name}_${m.type}_case`)
+    let el = shadow_root.getElementById(`${m.name}_${m.type}_case`)
     if (!el) return
     let sEl = el.querySelector(`.case_link`)
     if (sEl) {
@@ -864,7 +864,7 @@ function resultLink(m) {
 function resultSound(m) {
     let {nav, name, type, status, error} = m
     // if (error) dmxAlert(error, 'error') // 播放声音出错提示
-    let el = I(`${name}_${nav}_case`)
+    let el = shadow_root.getElementById(`${name}_${nav}_case`)
     if (!el) return
     if (status === 'start') {
         let sEl = el.querySelector(`[data-type=${type}]`)
@@ -873,11 +873,11 @@ function resultSound(m) {
         let dEl = el.querySelectorAll(`[data-type=${type}]`)
         if (dEl) rmClassD(dEl, 'active')
     }
-    addClass(I('dmx_voice'), 'dmx_show')
+    addClass(shadow_root.getElementById('dmx_voice'), 'dmx_show')
 }
 
 function activeRipple(el) {
-    rmClassD(A('.dmx_ripple'), 'active')
+    rmClassD(shadow_root.querySelectorAll('.dmx_ripple'), 'active')
     addClass(el, 'active')
 }
 
@@ -922,8 +922,8 @@ function autoChangeAction(text) {
     let arr = text.match(/\s+/g)
     let isWord = !arr || arr.length < 3 // 是否为单词活词组
 
-    A('#dmx_navigate > u').forEach(el => rmClass(el, 'active')) // 去掉选中
-    let onEl = E(`#dmx_navigate > u[action="${isWord ? 'dictionary' : 'translate'}"]`)
+    shadow_root.querySelectorAll('#dmx_navigate > u').forEach(el => rmClass(el, 'active')) // 去掉选中
+    let onEl = shadow_root.querySelector(`#dmx_navigate > u[action="${isWord ? 'dictionary' : 'translate'}"]`)
     if (onEl) {
         // 选中翻译或词典
         addClass(onEl, 'active')
@@ -977,7 +977,7 @@ function sendQuery(text) {
         if (!text) text = textTmp
         if (!text) return
     }
-    let el = I('dmx_navigate')
+    let el = shadow_root.getElementById('dmx_navigate')
     let action = el.querySelector('.active') && el.querySelector('.active').getAttribute('action')
     if (!action) {
         action = dialogConf.action
@@ -989,17 +989,17 @@ function sendQuery(text) {
     let message = null
     if (setting.cutHumpName === 'on' && action !== 'search') text = cutHumpName(text)
     if (action === 'translate') {
-        let inputEl = I(`translate_input`)
+        let inputEl = shadow_root.getElementById(`translate_input`)
         inputEl.innerText = text
         isPopup && focusLast(inputEl)
         loadingTranslate()
         message = {action: action, text: text, srcLan: dialogConf.source, tarLan: dialogConf.target}
     } else if (action === 'dictionary') {
-        I(`dictionary_input`).value = text
+        shadow_root.getElementById(`dictionary_input`).value = text
         loadingDictionary()
         message = {action: action, text: text}
     } else if (action === 'search') {
-        I(`search_input`).value = text
+        shadow_root.getElementById(`search_input`).value = text
     }
     showSearchSide(text)
     if (message) {
@@ -1080,7 +1080,7 @@ function showSearchSide(text) {
             if (url) s += `<a href="${url.format(decodeURIComponent(text))}" title="${name}" target="_blank">${name[0]}</a>`
         }
     }
-    I('dmx_dialog_left').innerHTML = s
+    shadow_root.getElementById('dmx_dialog_left').innerHTML = s
 }
 
 function showDialog(left, top) {
@@ -1120,7 +1120,7 @@ function addHistory(dQuery) {
     historyIndex = queryHistory.length - 1
     debug('history:', queryHistory, historyIndex)
     if (queryHistory.length > 1) {
-        let hEl = I('dmx_history')
+        let hEl = shadow_root.getElementById('dmx_history')
         rmClass(hEl.querySelector('.dmx-icon-left'), 'disabled')
         addClass(hEl.querySelector('.dmx-icon-right'), 'disabled')
     }
@@ -1133,18 +1133,6 @@ function focusLast(el) {
         range.selectAllChildren(el)
         range.collapseToEnd() // 光标移到结尾
     }, 200)
-}
-
-function I(id) {
-    return shadow.getElementById(id)
-}
-
-function E(s) {
-    return shadow.querySelector(s)
-}
-
-function A(s) {
-    return shadow.querySelectorAll(s)
 }
 
 function saveDialogConf() {
@@ -1215,11 +1203,11 @@ function sendBgMessage(message) {
 function dmxAlert(message, type, timeout) {
     type = type || 'info'
     timeout = timeout || 2500
-    let el = I('dmx_alert')
+    let el = shadow_root.getElementById('dmx_alert')
     if (!el) {
         el = document.createElement('div')
         el.id = 'dmx_alert'
-        shadow.appendChild(el)
+        shadow_root.appendChild(el)
     }
     let icon = {
         info: '<i class="dmx-icon dmx-icon-info"></i>',
@@ -1260,8 +1248,9 @@ function dmxDialog(options) {
     let d = document.createElement('div')
     d.setAttribute('mx-name', 'dream-translation')
     document.documentElement.appendChild(d)
-    shadow = d.attachShadow({mode: 'closed'})
-    shadow.innerHTML = `<link rel="stylesheet" href="${root + 'css/content.css'}">
+
+    shadow_root = d.attachShadow({mode: 'closed'})
+    shadow_root.innerHTML = `<link rel="stylesheet" href="${root + 'css/content.css'}">
 <style>${o.cssText}</style>
 <div id="dmx_dialog">
     <div id="dmx_dialog_title">
@@ -1301,8 +1290,9 @@ function dmxDialog(options) {
 <div id="dmx_crop_bg"></div>
 <div id="dmx_crop_fg"></div>`
 
-    let el = I('dmx_dialog')
-    let clientX, clientY, elX, elY, elW, elH, docW, docH, mid
+    let el = shadow_root.getElementById('dmx_dialog')
+    let clientX, clientY, elX, elY, elW, elH, docW, docH, mid;
+
     let _m = function (e) {
         let left = e.clientX - (clientX - elX)
         let top = e.clientY - (clientY - elY)
@@ -1403,9 +1393,10 @@ function dmxDialog(options) {
 
     let elArr = ['n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se']
     let fsTmp = {} // 全屏设置临时缓存
+
     let D = {}
     D.el = el
-    D.shadow = shadow
+    D.shadow = shadow_root
     D.destroy = function () {
         document.removeEventListener('mousemove', onMousemove)
         document.removeEventListener('mouseup', onMouseup)
@@ -1426,31 +1417,31 @@ function dmxDialog(options) {
         el.style.display = 'none'
     }
     D.enableMove = function () {
-        let e = I('dmx_dialog_title')
+        let e = shadow_root.getElementById('dmx_dialog_title')
         e.style.cursor = 'move'
         e.addEventListener('mousedown', onMousedown)
     }
     D.disableMove = function () {
-        let e = I('dmx_dialog_title')
+        let e = shadow_root.getElementById('dmx_dialog_title')
         e.style.cursor = 'auto'
         e.removeEventListener('mousedown', onMousedown)
     }
     D.enableResize = function () {
         elArr.forEach(v => {
-            let e = I(`dmx_dialog_resize_${v}`)
+            let e = shadow_root.getElementById(`dmx_dialog_resize_${v}`)
             e.removeAttribute('style')
             e.addEventListener('mousedown', onMousedown)
         })
     }
     D.disableResize = function () {
         elArr.forEach(v => {
-            let e = I(`dmx_dialog_resize_${v}`)
+            let e = shadow_root.getElementById(`dmx_dialog_resize_${v}`)
             e.style.display = 'none'
             e.removeEventListener('mousedown', onMousedown)
         })
     }
     D.fullScreen = function () {
-        addClass(I('dmx_fullscreen'), 'active')
+        addClass(shadow_root.getElementById('dmx_fullscreen'), 'active')
         addClass(document.body, 'dmx_overflow_hidden')
         fsTmp = {top: el.style.top, left: el.style.left, width: el.style.width, height: el.style.height}
         el.style.top = '0'
@@ -1459,7 +1450,7 @@ function dmxDialog(options) {
         el.style.height = document.documentElement.clientHeight + 'px'
     }
     D.fullScreenExit = function () {
-        rmClass(I('dmx_fullscreen'), 'active')
+        rmClass(shadow_root.getElementById('dmx_fullscreen'), 'active')
         rmClass(document.body, 'dmx_overflow_hidden')
         if (typeof fsTmp.top === 'string') el.style.top = fsTmp.top
         if (typeof fsTmp.left === 'string') el.style.left = fsTmp.left
@@ -1467,40 +1458,60 @@ function dmxDialog(options) {
         if (typeof fsTmp.height === 'string') el.style.height = fsTmp.height
     }
     D.pin = function () {
-        addClass(I('dmx_pin'), 'active')
+        addClass(shadow_root.getElementById('dmx_pin'), 'active')
         document.removeEventListener('mouseup', D.hide)
     }
     D.pinCancel = function () {
-        rmClass(I('dmx_pin'), 'active')
+        rmClass(shadow_root.getElementById('dmx_pin'), 'active')
         document.addEventListener('mouseup', D.hide) // 点击 body 隐藏 dialog
     }
     D.contentHTML = function (s) {
-        I('dmx_dialog_content').innerHTML = s
+        shadow_root.getElementById('dmx_dialog_content').innerHTML = s
     }
     window._MxDialog = D
 
     // 初始设置
-    if (o.width !== 'auto') el.style.width = Number(o.width) + 'px'
-    if (o.height !== 'auto') el.style.height = Number(o.height) + 'px'
-    o.show ? D.show() : D.hide()
-    o.autoHide ? D.pinCancel() : D.pin()
-    o.isMove ? D.enableMove() : D.disableMove()
-    o.isResize ? D.enableResize() : D.disableResize()
+    if (o.width !== 'auto') {
+        el.style.width = Number(o.width) + 'px'
+    }
+    if (o.height !== 'auto') {
+        el.style.height = Number(o.height) + 'px'
+    }
+    if (o.show) {
+        D.show()
+    } else {
+        D.hide()
+    }
+    if (o.autoHide) {
+        D.pinCancel()
+    } else {
+        D.pin()
+    }
+    if (o.isMove) {
+        D.enableMove()
+    } else {
+        D.disableMove()
+    }
+    if (o.isResize) {
+        D.enableResize()
+    } else {
+        D.disableResize()
+    }
 
     // 顶部按钮事件
-    I('dmx_close').onclick = function () {
+    shadow_root.getElementById('dmx_close').onclick = function () {
         D.hide()
         rmClass(document.body, 'dmx_overflow_hidden')
     }
-    I('dmx_pin').onclick = function () {
+    shadow_root.getElementById('dmx_pin').onclick = function () {
         hasClass(this, 'active') ? D.pinCancel() : D.pin()
     }
-    I('dmx_fullscreen').onclick = function () {
+    shadow_root.getElementById('dmx_fullscreen').onclick = function () {
         hasClass(this, 'active') ? D.fullScreenExit() : D.fullScreen()
     }
 
     // 阻止冒泡
-    shadow.querySelectorAll('.dmx-icon').forEach(v => {
+    shadow_root.querySelectorAll('.dmx-icon').forEach(v => {
         v.addEventListener('mousedown', e => e.stopPropagation())
     })
 

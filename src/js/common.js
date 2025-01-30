@@ -51,8 +51,8 @@ String.prototype.format = function () {
     })
 }
 
-export function storageLocalGet(options) {
-    return storage('local', 'get', options)
+export function storageLocalGet(keys) {
+    return storage('local', 'get', keys)
 }
 
 export function storageLocalSet(options) {
