@@ -1187,3 +1187,75 @@ a:hover {
     font-weight: bold;
     color: white;
 }
+
+@media (prefers-color-scheme: dark) {
+    a {
+      color: #c8c3bc;
+    }
+
+    #dmx_dialog {
+      background: #1c1f20;
+      color-scheme: dark;
+      color: #cdcdcd;
+    }
+    #dmx_dialog_title {
+      background: #1c1f20;
+      border-bottom: 1px solid #3d4245;
+    }
+    #dmx_dialog_title .dmx-icon {
+      color: #cdc8c2;
+    }
+    #dmx_dialog_title #dmx_history .dmx-icon.disabled {
+      color: #aca59a;
+      background: #1d2021;
+    }
+    #dmx_dialog_title #dmx_navigate u {
+      background: #28383d;
+      border: 1px solid #404548;
+    }
+    #dmx_dialog_title #dmx_navigate u.active {
+      background: #1d2021;
+      border-bottom: 1px solid #243648;
+    }
+    #dmx_head {
+      background: #1d2021;
+    }
+    #translate_crop {
+      background: #181a1b;
+      border: 1px solid #383d40;
+      color: #a9a297;
+    }
+    #translate_button {
+      background: #0047a4;
+      border: 1px solid #0044a3;
+      color: #e8e6e3;
+    }
+    #translate_input {
+      background: #181a1b;
+      color: #b5afa5;
+    }
+    .language_button {
+      background: #181a1b;
+      border: 1px solid #3d4245;
+    }
+    .case {
+      background: #181a1b;
+      border: 1px solid #3d4245;
+    }
+    .case_dd_parts p b {
+      color: #46acff;
+      background: #1d2021;
+      border: 1px solid #003971;
+    }
+    .case_dd_tags u {
+      color: #a59d91;
+      background: #1e2022;
+      border: 1px solid #363a3d;
+    }
+    .dmx_ripple {
+      color: #b4ada3;
+    }
+    .case_bilingual:after {
+      color: rgba(232, 230, 227, 0.26);
+  }
+}
