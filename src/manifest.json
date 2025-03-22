@@ -1,7 +1,7 @@
 {
-  "name": "Dream Translator",
-  "description": "梦想划词翻译是为阅读和学习外语而开发的一款翻译和查词工具，聚合数十款在线词典和在线翻译。",
-  "version": "1.6.27",
+  "name": "Dream Translator MV3",
+  "description": "A fork of 梦想划词翻译 with Manifest V3 support.",
+  "version": "1.6.27.1",
   "manifest_version": 3,
   "icons": {
     "128": "icon/128.png"
@@ -61,7 +61,7 @@
   "host_permissions": [
     "\u003Call_urls>"
   ],
-  "homepage_url": "https://github.com/qwinsi/dream-translator",
+  "homepage_url": "https://github.com/qwinsi/dream-translator-v3",
   "commands": {
     "_execute_action": {
       "description": "打开翻译面板",
