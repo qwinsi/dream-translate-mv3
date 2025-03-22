@@ -1,98 +1,18 @@
-# 梦想划词翻译（Chrome & Firefox 扩展程序）
-这是一款精心雕琢并免费开源的划词翻译扩展，也是一款致力于改善「中国式哑巴英语」而设计的一款英语练习扩展程序。
+# Dream Translator (Manifest V3)
 
-### 扩展安装
-- Chrome 安装：[梦想划词翻译—聚合词典搜索 - Chrome 网上应用店](https://chrome.google.com/webstore/detail/odfgigmpkhhhieicogijogfobfipijjh)
-- Edge 安装：[梦想划词翻译—聚合词典搜索 - Microsoft Edge 扩展商店](https://microsoftedge.microsoft.com/addons/detail/ogleeipbbcokpeabliinildngejmdneg)
-- Firefox 安装：[梦想划词翻译—聚合词典搜索 – Firefox 扩展商店](https://addons.mozilla.org/zh-CN/firefox/addon/dream_translate/)
+This is a fork of [ryankeep/dream_translate](https://github.com/ryankeep/dream_translate) for support of Manifest V3.
 
-### 程序特点
-考虑到程序的维护时间成本，本程序采用纯原生 javascript 开发，拥有更好的性能，同时占用内存更小，没有对各种技术栈的依赖，减少了 bug 的产生和维护时间的投入。
+## Limitations
 
-自主设计的轻量级翻译查词对话框，占用内存小，且可拖动大小，移动位置，固定和全屏窗口，使用起来简单便捷，顺心应手。
+The tremendous API changes from Manifest V2 to V3 have made it time-consuming to port the extension to V3. Currently, only part of translation and dictionary functions are ported completely, and the rest are unavailable.
 
-自主设计了大量字体图标，零图片使用，不仅减少了 IO 请求，内存占用也更低，还降低了程序业务逻辑和维护成本。
+- Translation: Only supports Sogou. It won't work if you choose other translation services.
+- Dictionary: Only supports Youdao. It won't work if you choose other dictionary services.
 
-程序代码短小精干，没有那么多花里胡哨的功能；也没有像剥洋葱一样的代码，读源码不会丈二和尚摸不着头脑。
+## Features
 
-### 快捷键
-目前支持 6 个快捷键，为便于记忆，默认预设置 4 个快捷键。
+Along with the original features, this fork has added some new features:
 
-划词翻译开关 Ctrl+Shift+X 「常用，很多时候都不需要开启划词翻译，这时关闭就行；类似"剪切"快捷键，记忆技巧：剪一下开，剪一下关，剪一下开啊，剪一下关。」
-
-打开翻译窗口 Ctrl+Shift+9 「较常用，这是一个全局快捷键，在使用任何软件时，都可以通过这个快捷键召唤翻译小窗口；记忆技巧：久的谐音，长长久久。」（目前 Firefox 不支持全局快捷键）
-
-截图识别翻译 Ctrl+Shift+A 「较常用，对页面局部切图后，识别图片内容，然后进行翻译。」
-
-打开翻译面板 Alt+D 「不常用，一般通过鼠标点击就可以了，但也提供给喜欢使用快捷键人群一个方便；记忆技巧：字母 D 是 Dream 首字母，梦想成真！」
-
-剪贴板内容翻译 「需要自定义启用，从剪贴板获取文本内容进行翻译。」
-
-停止播放声音 「需要自定义启用，有时朗读声音时，想要停止播放，可以通过此快捷键，快速停止播放声音。」
-
-最后，如果这些快捷键和你电脑快捷键冲突了，那就只能自定义符合自己习惯的快捷键了。^_^
-
-## 聚合的词典&翻译
-### 在线翻译（国内）
-百度翻译 https://fanyi.baidu.com
-
-谷歌翻译 https://translate.google.cn
-
-必应翻译 https://cn.bing.com/translator
-
-有道翻译 https://fanyi.youdao.com
-
-腾讯翻译 https://fanyi.qq.com
-
-搜狗翻译 https://fanyi.sogou.com
-
-阿里翻译 https://translate.alibaba.com
-
-360翻译 https://fanyi.so.com
-
-### 在线翻译（国外）
-DeepL翻译 https://www.deepl.com/translator (维基百科：专家认为它比 Google 翻译更准确自然)
-
-### 在线词典（国内）
-有道词典 https://www.youdao.com
-
-必应词典 https://cn.bing.com/dict
-
-海词词典 https://dict.cn
-
-金山词典 https://www.iciba.com
-
-欧路词典 https://dict.eudic.net
-
-人人词典 https://www.91dict.com
-
-沪江词典 https://www.hjdict.com
-
-译典词典 https://www.dreye.com.cn
-
-### 在线词典（国外）
-朗文词典 https://www.ldoceonline.com
-
-剑桥词典 https://dictionary.cambridge.org
-
-韦氏词典 https://www.merriam-webster.com
-
-柯林斯词典 https://www.collinsdictionary.com
-
-牛津词典 https://www.oxfordlearnersdictionaries.com
-
-自由词典 https://www.thefreedictionary.com
-
-词曲词典 https://www.lexico.com
-
-在线词典 https://www.dictionary.com
-
-词汇词典 https://www.vocabulary.com
-
-语言词典 https://www.wordreference.com
-
-词源词典 https://www.etymonline.com
-
-城市词典 https://www.urbandictionary.com
-
-麦克米伦词典 https://www.macmillandictionary.com
+- Support for dragging selected text to query.
+- Normal color theme for popup window in websites with a dark color scheme. (e.g. GitHub in dark mode)
+- Support for pressing `ESC` to close the popup window.
