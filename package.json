@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
-    "build": "bun build --entrypoints src/js/background.js src/js/content.js --outdir ./dist/js && node tool/remove-export.js"
+    "build": "esbuild src/js/background.js --outdir=dist/js --bundle --minify && esbuild src/js/content.js --outdir=dist/js --bundle --minify && node tool/remove-export.js"
   },
   "devDependencies": {
+    "esbuild": "^0.25.1",
     "eslint": "^9.18.0",
     "globals": "^15.14.0",
     "rimraf": "^3.0.2"
