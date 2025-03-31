@@ -289,7 +289,7 @@ function youdaoTranslate() {
                 let le = lanArr[lan] || lanArr.en
                 // resolve(`https://tts.youdao.com/fanyivoice?word=${encodeURI(q)}&le=eng&keyfrom=speaker-target`)
                 let getUrl = (s) => {
-                    return `https://dict.youdao.com/dictvoice?audio=${encodeURI(s)}&le=${le}`
+                    return `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(s)}&type=2`
                 }
                 let r = []
                 let arr = sliceStr(q, 128)
