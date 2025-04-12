@@ -1,0 +1,103 @@
+{
+  "name": "Dream Translator MV3",
+  "description": "A fork of 梦想划词翻译 with Manifest V3 support.",
+  "version": "1.6.27.1",
+  "manifest_version": 3,
+  "icons": {
+    "128": "icon/128.png"
+  },
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "\u003Call_urls>"
+      ],
+      "js": [
+        "js/content.js"
+      ],
+      "css": [
+        "css/content.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "all_frames": true,
+      "matches": [
+        "\u003Call_urls>"
+      ],
+      "js": [
+        "js/frame.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "html/popup.html",
+    "default_title": "梦想划词翻译",
+    "default_icon": "icon/128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "css/*",
+        "html/*"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "clipboardRead",
+    "cookies",
+    "contextMenus",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "\u003Call_urls>"
+  ],
+  "homepage_url": "https://github.com/qwinsi/dream-translator-v3",
+  "commands": {
+    "_execute_action": {
+      "description": "打开翻译面板",
+      "suggested_key": {
+        "default": "Alt+D"
+      }
+    },
+    "openWindow": {
+      "description": "打开翻译窗口",
+      "suggested_key": {
+        "default": "Ctrl+Shift+9"
+      }
+    },
+    "toggleScribble": {
+      "description": "划词翻译开关",
+      "suggested_key": {
+        "default": "Ctrl+Shift+X"
+      }
+    },
+    "cropImage": {
+      "description": "截图识别翻译",
+      "suggested_key": {
+        "default": "Ctrl+Shift+A"
+      }
+    },
+    "stopPlayAudio": {
+      "description": "停止播放声音"
+    },
+    "clipboardTrans": {
+      "description": "剪贴板内容翻译"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "addon@example.com",
+      "strict_min_version": "109.0"
+    }
+  }
+}
+
+

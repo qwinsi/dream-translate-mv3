@@ -12,9 +12,7 @@
     "autoWords": "",
     "cutHumpName": "on",
     "translateList": [
-      "baidu",
-      "google",
-      "youdao"
+      "sogou"
     ],
     "translateTTSList": [],
     "localSoundReplace": "",
@@ -25,9 +23,7 @@
     "autoLanguage": "on",
     "autoConfirm": "on",
     "dictionaryList": [
-      "youdao",
-      "bing",
-      "longman"
+      "youdao"
     ],
     "dictionarySoundList": [],
     "dictionaryReader": "us",

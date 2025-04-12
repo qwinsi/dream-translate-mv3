@@ -3,8 +3,10 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "prebuild": "rimraf dist && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
-    "build": "esbuild src/js/background.js --outdir=dist/js --bundle --minify && esbuild src/js/content.js --outdir=dist/js --bundle --minify && node tool/remove-export.js"
+    "prebuild": "rimraf dist dist-firefox && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
+    "build:chromium": "esbuild src/js/background.js --outdir=dist/js --bundle --minify && esbuild src/js/content.js --outdir=dist/js --bundle && node tool/remove-export.js",
+    "build:firefox": "cp -r dist dist-firefox && cp src/manifest-firefox.json dist-firefox/manifest.json && node tool/fix-css.js dist-firefox/css/content.css",
+    "build": "npm run build:chromium && npm run build:firefox"
   },
   "devDependencies": {
     "esbuild": "^0.25.1",

@@ -4,9 +4,7 @@ This is a fork of [ryankeep/dream_translate](https://github.com/ryankeep/dream_t
 
 ## Limitations
 
-1. Only supports Google Chrome and Microsoft Edge, as Firefox does not support Manifest V3 yet.
-
-2. The tremendous API changes from Manifest V2 to V3 have made it time-consuming to port the extension to V3. Currently, only part of translation and dictionary functions are ported completely, and the rest are unavailable. Ported functions include:
+The tremendous API changes from Manifest V2 to V3 have made it time-consuming to port the extension to V3. Currently, only part of translation and dictionary functions are ported completely, and the rest are unavailable. Ported functions include:
 
 - Translation: Only supports Sogou. It won't work if you choose other translation services.
 - Dictionary: Only supports Youdao. It won't work if you choose other dictionary services.

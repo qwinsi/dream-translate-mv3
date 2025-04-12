@@ -13,6 +13,7 @@ div[mx-name="dream-translation"] {
     all: initial;
 }
 
+/* Chromium-only */
 @font-face {
     font-family: "dmx-icon";
     /*src: url('dmx_icon.woff2') format('woff2');*/
