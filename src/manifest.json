@@ -1,7 +1,7 @@
 {
   "name": "Dream Translator MV3",
   "description": "A fork of 梦想划词翻译 with Manifest V3 support.",
-  "version": "1.6.27.1",
+  "version": "1.6.27.2",
   "manifest_version": 3,
   "icons": {
     "128": "icon/128.png"

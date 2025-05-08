@@ -25,6 +25,7 @@ let dQuery = {action: '', text: '', source: '', target: ''}
 let textTmp = ''
 let queryHistory = [], historyIndex = 0, disHistory = false
 let searchText
+
 document.addEventListener('DOMContentLoaded', async function () {
     let u = new URL(location.href);
     isFullscreen = u.searchParams.get('fullscreen') === '1'
@@ -120,6 +121,15 @@ B.storage.onChanged.addListener(function (data) {
                 bindDragEvent();
             }
 
+            // decide whether to toggle mouseup event listener
+            const old_need_mouseup = setting.scribble === 'direct' || setting.scribble === 'clickIcon';
+            const new_need_mouseup = v.scribble === 'direct' || v.scribble === 'clickIcon';
+            if (old_need_mouseup && !new_need_mouseup) {
+                unbindMouseupEvent();
+            } else if (!old_need_mouseup && new_need_mouseup) {
+                bindMouseupEvent();
+            }
+
             setting = v
             debug('new setting:', v)
 
@@ -147,8 +157,7 @@ function dropEventListener(event) {
             let text = event.dataTransfer.getData('text/plain');
             text = text.trim();
             if (text !== '') {
-                sendQuery(text);
-                showDialog(event.clientX + 10, event.clientY - 35)
+                initQuery(text, event.clientX + 10, event.clientY - 35);
             }
 
             event.preventDefault();
@@ -171,6 +180,19 @@ function bindDragEvent() {
 
 function unbindDragEvent() {
     document.removeEventListener('drop', dropEventListener, false);
+}
+
+function mouseupEventListener(e) {
+    let text = window.getSelection().toString().trim()
+    initQuery(text, e.clientX, e.clientY)
+}
+
+function bindMouseupEvent() {
+    document.addEventListener('mouseup', mouseupEventListener, false);
+}
+
+function unbindMouseupEvent() {
+    document.removeEventListener('mouseup', mouseupEventListener, false);
 }
 
 // 初始对话框
@@ -223,10 +245,9 @@ function initDialog() {
     }
 
     // 划词查询
-    document.addEventListener('mouseup', function (e) {
-        let text = window.getSelection().toString().trim()
-        initQuery(text, e.clientX, e.clientY)
-    })
+    if (setting.scribble === 'direct' || setting.scribble === 'clickIcon') {
+        bindMouseupEvent();
+    }
 
     // 鼠标图标
     iconBut = shadow_root.getElementById('dmx_mouse_icon')
@@ -982,6 +1003,10 @@ function initQuery(text, clientX, clientY) {
         y = y > 10 ? y : clientY + 10
         iconBut.style.transform = `translate(${x}px, ${y}px)`
         iconBut.style.display = 'flex'
+    } else if (setting.scribble === 'drag') {
+        autoChangeAction(text) // 自动切换翻译或词典
+        sendQuery(text) // 划词查询
+        showDialog(clientX + 10, clientY - 35)
     }
 }
 
