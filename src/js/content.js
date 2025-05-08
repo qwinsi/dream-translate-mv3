@@ -102,7 +102,9 @@ B.onMessage.addListener(function (m, sender, sendResponse) {
 // 监听 frame 消息
 window.addEventListener("message", function (m) {
     let d = m.data
-    if (d.text && typeof d.clientX === 'number' && typeof d.clientY === 'number') initQuery(d.text, d.clientX, d.clientY)
+    if (d.text && typeof d.clientX === 'number' && typeof d.clientY === 'number') {
+        initQuery(d.text, d.clientX, d.clientY)
+    }
 })
 
 // 监听设置修改
@@ -140,7 +142,6 @@ function isTextArea(element) {
 
 // Code from https://github.com/iorate/uSuperDrag (MIT license)
 function dropEventListener(event) {
-
     if (event.dataTransfer.types.includes('text/plain')) {
         if (!isTextArea(event.target)) {
             let text = event.dataTransfer.getData('text/plain');
@@ -157,12 +158,12 @@ function dropEventListener(event) {
 
 function bindDragEvent() {
     document.addEventListener('dragover', event => {
-    if (event.dataTransfer.types.includes('text/plain')) {
-        if (!isTextArea(event.target)) {
-            event.dataTransfer.dropEffect = 'link';
-            event.preventDefault();
+        if (event.dataTransfer.types.includes('text/plain')) {
+            if (!isTextArea(event.target)) {
+                event.dataTransfer.dropEffect = 'link';
+                event.preventDefault();
+            }
         }
-    }
     }, false);
 
     document.addEventListener('drop', dropEventListener, false);
