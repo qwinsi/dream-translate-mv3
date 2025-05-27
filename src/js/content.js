@@ -977,6 +977,11 @@ function initQuery(text, clientX, clientY) {
     if (setting.excludeSymbol && /^[\p{S}\p{P}^$.*+\-?=!:|\\/！？。；－＿～﹏，：、·;…,"“”﹃﹄「」﹁﹂『』﹃﹄（）［］〔〕【】《》〈〉()\[\]{}<>\s]+$/u.test(text)) return // 排除纯符号
     if (setting.excludeNumber && /^\d+$/u.test(text)) return // 排除纯数字
 
+    // ignore URL
+    if (/^[a-z]+:\/\/[^\s]+$/.test(text)) {
+        return;
+    }
+
     sendBgCache(text)
     if (!text) {
         iconBut.style.display = 'none'
