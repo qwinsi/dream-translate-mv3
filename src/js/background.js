@@ -211,7 +211,9 @@ async function runTranslate(tabId, m) {
 
             const link = sogou_translate.link(text, srcLan, tarLan);
             sandFgMessage(tabId, {action: 'link', type: action, name, link});
+            return;
         }
+
         sdkInit(`${name}Translate`).then(sd => {
             sd.query(text, srcLan, tarLan).then(result => {
                 debug(`${name}:`, result)
@@ -256,6 +258,7 @@ function runDictionary(tabId, m) {
             sandFgMessage(tabId, {action: 'link', type: action, name, link: url, text});
             return;
         }
+
         sdkInit(`${name}Dictionary`).then(sd => {
             sd.query(text).then(result => {
                 debug(`${name}:`, result)
