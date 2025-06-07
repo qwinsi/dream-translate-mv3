@@ -59,7 +59,7 @@
   "host_permissions": [
     "\u003Call_urls>"
   ],
-  "homepage_url": "https://github.com/qwinsi/dream-translator-v3",
+  "homepage_url": "https://github.com/qwinsi/dream-translate-mv3",
   "commands": {
     "_execute_action": {
       "description": "打开翻译面板",
