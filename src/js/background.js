@@ -110,53 +110,60 @@ B.contextMenus.onClicked.addListener(function (info, tab) {
 
 // 监听消息
 B.onMessage.addListener(function (m, sender, sendResponse) {
-    debug('request:', m)
-    debug('sender:', sender && sender.url ? sender.url : sender)
-    let tabId = getJSONValue(sender, 'tab.id')
-    if (!tabId) tabId = 'popup'
+    try{
+        debug('request:', m)
+        debug('sender:', sender && sender.url ? sender.url : sender)
+        let tabId = getJSONValue(sender, 'tab.id')
+        if (!tabId) tabId = 'popup'
 
-    if (m.action === 'translate') {
-        createHistory(m) // 保存历史记录
-        runTranslate(tabId, m)
-    } else if (m.action === 'translateTTS') {
-        runTranslateTTS(tabId, m)
-    } else if (m.action === 'dictionary') {
-        runDictionary(tabId, m)
-    } else if (m.action === 'playSound') {
-        runPlaySound(tabId, m)
-    } else if (m.action === 'menu') {
-        changeMenu(m.name, m.isAdd)
-    } else if (m.action === 'saveSetting') {
-        saveSettingAll(m.setting, m.updateIcon, m.resetDialog)
-    } else if (m.action === 'copy') {
-        execCopy(m.text) // 后台复制，页面才不会失去焦点
-    } else if (m.action === 'transWindow') {
-        openTransWindow()
-    } else if (m.action === 'onRecord') {
-        openRecord()
-    } else if (m.action === 'openUrl') {
-        openTab(m.url)
-    } else if (m.action === 'onAllowSelect') {
-        sendAllowSelect()
-    } else if (m.action === 'onCropImg') {
-        cropImageSendMsg()
-    } else if (m.action === 'onSaveSearchText') {
-        saveSearchText(m.searchText)
-    } else if (m.action === 'onCapture') {
-        setTimeout(_ => capturePic(sender.tab, m), 100)
-    } else if (m.action === 'img2text') {
-        getOcrText(tabId, m.base64).catch()
-    } else if (m.action === 'textTmp') {
-        textTmp = m.text // 划词文字缓存
-    } else if (m.action === 'getTextTmp') {
-        console.log("textTmp in background.js: ", textTmp);
-        sendResponse(textTmp);
-        return; // don't call sendResponse() again
-    } else {
-        console.error('[background.js onMessage] bad m: ' + m);
-        throw new Error('[background.js onMessage] Unknown action: ' + m.action);
+        if (m.action === 'translate') {
+            createHistory(m) // 保存历史记录
+            runTranslate(tabId, m)
+        } else if (m.action === 'translateTTS') {
+            runTranslateTTS(tabId, m)
+        } else if (m.action === 'dictionary') {
+            runDictionary(tabId, m)
+        } else if (m.action === 'playSound') {
+            runPlaySound(tabId, m)
+        } else if (m.action === 'menu') {
+            changeMenu(m.name, m.isAdd)
+        } else if (m.action === 'saveSetting') {
+            saveSettingAll(m.setting, m.updateIcon, m.resetDialog)
+        } else if (m.action === 'copy') {
+            execCopy(m.text) // 后台复制，页面才不会失去焦点
+        } else if (m.action === 'transWindow') {
+            openTransWindow()
+        } else if (m.action === 'onRecord') {
+            openRecord()
+        } else if (m.action === 'openUrl') {
+            openTab(m.url)
+        } else if (m.action === 'onAllowSelect') {
+            sendAllowSelect()
+        } else if (m.action === 'onCropImg') {
+            cropImageSendMsg()
+        } else if (m.action === 'onSaveSearchText') {
+            saveSearchText(m.searchText)
+        } else if (m.action === 'onCapture') {
+            setTimeout(_ => capturePic(sender.tab, m), 100)
+        } else if (m.action === 'img2text') {
+            getOcrText(tabId, m.base64).catch()
+        } else if (m.action === 'textTmp') {
+            textTmp = m.text // 划词文字缓存
+        } else if (m.action === 'getTextTmp') {
+            console.log("textTmp in background.js: ", textTmp);
+            sendResponse(textTmp);
+            return; // don't call sendResponse() again
+        } else {
+            console.error('[background.js onMessage] Unknown action: ' + m.action);
+        }
+        sendResponse();
+    } catch (err) {
+        // If an error occurs, the browser will send the error to chrome.runtime.sendMessage's caller (i.e. content script)
+        // rather than printing the error in this background script's console.
+        // This behavior makes debugging difficult, so we have to explicitly catch and log the error here.
+        console.error('[background.js onMessage] error:', err);
+        throw err;
     }
-    sendResponse();
 })
 
 // 监听快捷键

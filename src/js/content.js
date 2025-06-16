@@ -1238,7 +1238,7 @@ function sendBgMessage(message) {
                 window.dmxUpdateDate = getTimestamp() + 5
                 dmxAlert('梦想翻译已升级，请刷新页面激活。', 'error')
             }
-            debug('sendBgMessage error:', err)
+            console.error('sendBgMessage error:', err)
             // reject(err)
             resolve()
         })
