@@ -20,6 +20,11 @@ if (typeof window === 'undefined') {
  * @license MIT License
  */
 
+/*
+ TODO: Global variables like `setting` should be avoided in service worker scripts!
+ Google's documentation says "Persist data rather than using global variables".
+ https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#persist-data
+ */
 let conf, setting, sdk = {}
 let searchText, searchList
 let ocrToken = '', ocrExpires = 0
@@ -192,19 +197,22 @@ sogou_translate.init();
 
 async function runTranslate(tabId, m) {
     let {action, text, srcLan, tarLan} = m
+
+    const { setting: sett } = await storageSyncGet(['setting']);
+
     if (srcLan === 'auto') {
         srcLan = await autoLang(text)
         if (srcLan === tarLan) tarLan = srcLan === 'zh' ? 'en' : 'zh'
-    } else if (setting.autoLanguage) {
+    } else if (sett.autoLanguage) {
         if (/\p{Script=Han}/u.test(text)) srcLan = 'zh'
         if (srcLan === tarLan) tarLan = srcLan === 'zh' ? 'en' : 'zh'
     }
-    setting.translateList.forEach(name => {
+    sett.translateList.forEach(name => {
         if(name === 'sogou') {
             sogou_translate.fetch(text, srcLan, tarLan).then(html => {
                 const incomplete_result = { text, srcLan, tarLan, langTTS: null };
                 const settings_to_parser = {
-                    translateThin: setting.translateThin,
+                    translateThin: sett.translateThin,
                 };
                 sandFgMessage(tabId, {
                     action,
@@ -253,10 +261,13 @@ function runTranslateTTS(tabId, m) {
     })
 }
 
-function runDictionary(tabId, m) {
+async function runDictionary(tabId, m) {
     let {action, text} = m
     window.dictionarySounds = {} // 返回的发音缓存
-    setting.dictionaryList.forEach(name => {
+
+    const { setting: sett } = await storageSyncGet(['setting']);
+
+    sett.dictionaryList.forEach(name => {
         if(name === 'youdao') {
             const url = `https://www.youdao.com/w/eng/${encodeURIComponent(text)}`;
             fetch(url).then(r => r.text()).then(html => {
