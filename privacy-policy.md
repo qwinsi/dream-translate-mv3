@@ -1,4 +1,4 @@
-# Privacy Policy
+# Privacy Policy for Dream Translator MV3 Extension
 
 This document is made for implementing Chrome Web Store's requirements for privacy policy.
 
