@@ -616,11 +616,6 @@ select {
     resize: vertical;
 }
 
-#search_list_dialog textarea {
-    width: 100%;
-    min-height: 280px;
-}
-
 #speak_input:focus {
     border-color: #409eff;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);

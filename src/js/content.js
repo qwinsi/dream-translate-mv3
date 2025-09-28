@@ -1,6 +1,6 @@
 import {
     storageLocalGet, storageSyncGet, B, storageShowAll, debug, addClass, rmClassD, sendMessage, _setTimeout,
-    rmClass, hasClass, getSearchList, onD, execCopy, inArray, execPaste, isArray, storageSyncSet,
+    rmClass, hasClass, execCopy, inArray, execPaste, storageSyncSet,
     getTimestamp
 } from './common';
 import { youdaoDictionary } from './dictionary/youdao';
@@ -24,7 +24,6 @@ let dialog, shadow_root,
 let dQuery = {action: '', text: '', source: '', target: ''}
 let textTmp = ''
 let queryHistory = [], historyIndex = 0, disHistory = false
-let searchText
 
 document.addEventListener('DOMContentLoaded', async function () {
     let u = new URL(location.href);
@@ -39,10 +38,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         dictionaryCSS = r.dictionaryCSS
     })
 
-    await storageSyncGet(['setting', 'dialogConf', 'searchText']).then(function (r) {
+    await storageSyncGet(['setting', 'dialogConf']).then(function (r) {
         setting = r.setting
         dialogConf = Object.assign({}, conf.dialogConf, r.dialogConf)
-        searchText = r.searchText
     })
 
     // 初始对话框
@@ -135,9 +133,6 @@ B.storage.onChanged.addListener(function (data) {
 
             // 初始对话框CSS
             initDictionaryCSS()
-        } else if (k === 'searchText') {
-            searchText = v
-            debug('new searchText:', v)
         }
     })
 })
@@ -266,7 +261,7 @@ function initDialog() {
     uEl.forEach(e => {
         e.addEventListener('click', function () {
             let action = this.getAttribute('action')
-            if (!['translate', 'dictionary', 'search'].includes(action)) return
+            if (!['translate', 'dictionary'].includes(action)) return
             if (dQuery.action === action) return
             rmClassD(uEl, 'active')
             addClass(this, 'active')
@@ -275,8 +270,6 @@ function initDialog() {
                 initTranslate()
             } else if (action === 'dictionary') {
                 initDictionary()
-            } else if (action === 'search') {
-                initSearch()
             }
             sendQuery(dQuery.text) // 切换导航查询
         })
@@ -285,7 +278,7 @@ function initDialog() {
     // 初始模块
     let action = dialogConf.action
     if (action) {
-        if (!['translate', 'dictionary', 'search'].includes(action)) action = 'translate'
+        if (!['translate', 'dictionary'].includes(action)) action = 'translate'
         let actionEl = nav.querySelector(`u[action="${action}"]`)
         if (actionEl) actionEl.click()
     }
@@ -360,8 +353,6 @@ function initDialog() {
             initTranslate()
         } else if (action === 'dictionary') {
             initDictionary()
-        } else if (action === 'search') {
-            initSearch()
         }
         sendQuery(text) // 历史记录查询
     }
@@ -567,58 +558,6 @@ function initDictionary() {
         if (isPopup) _setTimeout('dictionary', () => butEl.click(), 1000) // 定时自动开始查词
     })
     setTimeout(() => inpEl.focus(), 100)
-}
-
-function initSearch() {
-    dialog.contentHTML(`<div id="dmx_head">
-    <div class="case search_box">
-        <input id="search_input" type="text" maxlength="100" autocomplete="off">
-        <div id="search_remove"><i class="dmx-icon dmx-icon-error"></i></div>
-        <div id="search_but"><i class="dmx-icon dmx-icon-search"></i></div>
-    </div>
-</div>
-<div id="case_list" class="dmx_main dmx_content dmx_main_search fx"></div>`)
-
-    let inpEl = shadow_root.getElementById('search_input')
-    let rmEl = shadow_root.getElementById('search_remove')
-    let butEl = shadow_root.getElementById('search_but')
-    rmEl.onclick = function () {
-        inpEl.value = ''
-        inpEl.focus()
-    }
-    butEl.onclick = function () {
-        let el = shadow_root.getElementById('case_list').querySelector('[data-search]')
-        if (el) el.click()
-    }
-    inpEl.addEventListener('change', function () {
-        textTmp = this.value
-    })
-    inpEl.addEventListener('keyup', function (e) {
-        e.key === 'Enter' && butEl.click()
-    })
-    setTimeout(() => inpEl.focus(), 100)
-
-    // 创建按钮
-    let s = ''
-    let sList = setting.searchList
-    let cList = getSearchList(searchText)
-    for (let name of sList) {
-        if (cList[name]) s += `<div class="dmx_button" data-search="${name}">${name}</div>`
-    }
-    shadow_root.getElementById('case_list').innerHTML = s
-
-    // 绑定点击事件
-    onD(shadow_root.querySelectorAll('[data-search]'), 'click', function () {
-        let name = this.dataset.search
-        let url = cList[name]
-        if (!url) return
-        let text = shadow_root.getElementById('search_input').value.trim()
-        if (text) {
-            open(url.format(decodeURIComponent(text)))
-        } else {
-            open((new URL(url)).origin)
-        }
-    })
 }
 
 function initSetting() {
@@ -1032,7 +971,7 @@ function sendQuery(text) {
     if (!checkChange(action, text)) return
 
     let message = null
-    if (setting.cutHumpName === 'on' && action !== 'search') text = cutHumpName(text)
+    if (setting.cutHumpName === 'on') text = cutHumpName(text)
     if (action === 'translate') {
         let inputEl = shadow_root.getElementById(`translate_input`)
         inputEl.innerText = text
@@ -1043,10 +982,7 @@ function sendQuery(text) {
         shadow_root.getElementById(`dictionary_input`).value = text
         loadingDictionary()
         message = {action: action, text: text}
-    } else if (action === 'search') {
-        shadow_root.getElementById(`search_input`).value = text
     }
-    showSearchSide(text)
     if (message) {
         message = Object.assign({formTitle: document.title, formUrl: location.href}, message)
         sendBgMessage(message)
@@ -1115,19 +1051,6 @@ function mouseWords(e) {
     range.detach()
 }
 
-function showSearchSide(text) {
-    let arr = setting.searchSide
-    let s = ''
-    if (text && isArray(arr) && arr.length > 0) {
-        let sList = getSearchList(searchText)
-        for (let name of arr) {
-            let url = sList[name]
-            if (url) s += `<a href="${url.format(decodeURIComponent(text))}" title="${name}" target="_blank">${name[0]}</a>`
-        }
-    }
-    shadow_root.getElementById('dmx_dialog_left').innerHTML = s
-}
-
 function showDialog(left, top) {
     let options = null
     let position = setting.position
@@ -1155,7 +1078,7 @@ function checkChange(action, text) {
 
 function addHistory(dQuery) {
     if (disHistory) return disHistory = false
-    if (!['translate', 'dictionary', 'search'].includes(dQuery.action)) return
+    if (!['translate', 'dictionary'].includes(dQuery.action)) return
     if (historyIndex < queryHistory.length - 1) {
         queryHistory.splice(historyIndex + 1, queryHistory.length)
     } else if (queryHistory.length >= 1000) {
@@ -1310,7 +1233,6 @@ function dmxDialog(options) {
             <div id="dmx_navigate">
                 <u class="dmx-icon" action="translate">翻译</u>
                 <u class="dmx-icon" action="dictionary">词典</u>
-                <u class="dmx-icon" action="search">搜索</u>
             </div>
         </div>
         <div class="dmx_right">
@@ -1329,7 +1251,6 @@ function dmxDialog(options) {
     <div id="dmx_dialog_resize_ne"></div>
     <div id="dmx_dialog_resize_sw"></div>
     <div id="dmx_dialog_resize_se"></div>
-    <div id="dmx_dialog_left"></div>
 </div>
 <div id="dmx_mouse_icon"></div>
 <div id="dmx_crop_bg"></div>

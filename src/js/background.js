@@ -1,7 +1,6 @@
-import md5 from "blueimp-md5";
 import { idb, initFavorite, initHistory } from "./db";
 import {
-    isFirefox, B, storageLocalSet, debug, storageSyncGet, getSearchList, uniqueArray, storageShowAll,
+    isFirefox, B, storageLocalSet, debug, storageSyncGet, uniqueArray, storageShowAll,
     sendTabMessage, getActiveTabId, getJSONValue, execCopy, sandFgMessage, httpPost, httpGet,
     getTimestamp, storageSyncSet, sleep, _setTimeout, storageLocalGet
 } from "./common";
@@ -26,7 +25,6 @@ if (typeof window === 'undefined') {
  https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle#persist-data
  */
 let conf, setting, sdk = {}
-let searchText, searchList
 let ocrToken = '', ocrExpires = 0
 var textTmp = ''
 var historyMax = 3000
@@ -34,9 +32,6 @@ async function main() {
     let languageList = '', dialogCSS = '', dictionaryCSS = {}
     await fetch('../conf/conf.json').then(r => r.json()).then(r => {
         conf = r
-    })
-    await fetch('../conf/searchText.txt').then(r => r.text()).then(str => {
-        searchText = str
     })
     await fetch('../conf/language.json').then(r => r.text()).then(s => {
         languageList += s
@@ -51,10 +46,8 @@ async function main() {
     }
     storageLocalSet({conf, languageList, dialogCSS, dictionaryCSS}).catch(err => debug(`save error: ${err}`))
 
-    await storageSyncGet(['setting', 'searchText']).then(function (r) {
+    await storageSyncGet(['setting']).then(function (r) {
         saveSettingAll(r.setting, true) // 初始设置参数
-        searchList = getSearchList(r.searchText || searchText)
-        if (!r.searchText) saveSearchText('') // 如果为空，设置默认值
     })
 
     // 最大保存历史记录数
@@ -66,12 +59,6 @@ async function main() {
     // 加载 js
     loadJs(uniqueArray(Object.keys(conf.translateList).concat(Object.keys(conf.translateTTSList))), 'translate')
     loadJs(Object.keys(conf.dictionaryList), 'dictionary')
-
-    // 添加菜单
-    setting.searchMenus.forEach(name => {
-        let url = searchList[name]
-        url && addMenu(name, name, url)
-    })
 
     // 初始数据库
     idb('favorite', 1, initFavorite) // 否则第一次安装时，"我的收藏"需要刷新一下才能正常看到数据。
@@ -130,8 +117,6 @@ B.onMessage.addListener(function (m, sender, sendResponse) {
             runDictionary(tabId, m)
         } else if (m.action === 'playSound') {
             runPlaySound(tabId, m)
-        } else if (m.action === 'menu') {
-            changeMenu(m.name, m.isAdd)
         } else if (m.action === 'saveSetting') {
             saveSettingAll(m.setting, m.updateIcon, m.resetDialog)
         } else if (m.action === 'copy') {
@@ -146,8 +131,6 @@ B.onMessage.addListener(function (m, sender, sendResponse) {
             sendAllowSelect()
         } else if (m.action === 'onCropImg') {
             cropImageSendMsg()
-        } else if (m.action === 'onSaveSearchText') {
-            saveSearchText(m.searchText)
         } else if (m.action === 'onCapture') {
             setTimeout(_ => capturePic(sender.tab, m), 100)
         } else if (m.action === 'img2text') {
@@ -400,17 +383,10 @@ function getOcrToken() {
     })
 }
 
-function saveSearchText(s) {
-    if (!s) s = searchText
-    storageSyncSet({searchText: s})
-    searchList = getSearchList(s)
-}
-
 function saveSettingAll(data, updateIcon, resetDialog) {
     setting = Object.assign({}, conf.setting, data)
     updateIcon && changeBrowserIcon(setting.scribble) // 是否显示关闭划词图标
     let options = resetDialog ? {setting, dialogConf: {}} : {setting}
-    if (resetDialog) saveSearchText('')
     storageSyncSet(options)
 }
 
@@ -426,45 +402,6 @@ function setBrowserAction(text) {
     isFirefox && B.browserAction.setBadgeTextColor({color: 'white'})
 }
 
-function changeMenu(name, isAdd) {
-    let url = searchList[name]
-    if (url) isAdd ? addMenu(name, name, url) : removeMenu(name)
-}
-
-function addMenu(name, title, url) {
-    // {type: "separator"}
-    let mid = md5(name)
-    B.contextMenus.create({
-        id: 'page_' + mid,
-        title: title + '首页',
-        contexts: ["page"],
-        // onclick: function () {
-            // B.tabs.create({url: (new URL(url)).origin})
-        // }
-    })
-    B.contextMenus.create({
-        id: 'selection_' + mid,
-        title: title + "“%s”",
-        contexts: ["selection"],
-        // onclick: function (info) {
-            // B.tabs.create({url: url.format(decodeURIComponent(info.selectionText))})
-        // }
-    })
-
-    B.contextMenus.onClicked.addListener(function (info, tab) {
-        if(info.menuItemId === 'page_' + mid) {
-            B.tabs.create({url: (new URL(url)).origin})
-        } else if(info.menuItemId === 'selection_' + mid) {
-            B.tabs.create({url: url.format(decodeURIComponent(info.selectionText))})
-        }
-    });
-}
-
-function removeMenu(name) {
-    let mid = md5(name)
-    B.contextMenus.remove('page_' + mid)
-    B.contextMenus.remove('selection_' + mid)
-}
 
 function openTransWindow() {
     openWindow('trans', 600, 520, B.root + 'html/popup.html?fullscreen=1')

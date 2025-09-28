@@ -36,6 +36,7 @@ function youdaoTranslate() {
         },
         langMapInvert: {},
         lanTTS: ["en", "zh", "jp", "kor", "fra"],
+        // TODO: maybe import md5 from "blueimp-md5";
         md5(e) {
             var n = function (e, t) {
                 return e << t | e >>> 32 - t

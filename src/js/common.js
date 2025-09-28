@@ -367,12 +367,6 @@ export function D(s) {
     return document.querySelectorAll(s)
 }
 
-export function onD(el, type, listener, options) {
-    el.forEach(v => {
-        v.addEventListener(type, listener, options)
-    })
-}
-
 export function unD(el, type, listener, options) {
     el.forEach(v => {
         v.removeEventListener(type, listener, options)
@@ -432,19 +426,6 @@ export function isFunction(o) {
     return Object.prototype.toString.call(o) === '[object Function]'
 }
 
-export function getSearchList(s) {
-    s = s.trim()
-    let arr = s.split('\n')
-    let r = {}
-    for (let v of arr) {
-        v = v.trim()
-        let a = v.split('|')
-        let key = a[0] && a[0].trim()
-        let val = a[1] && a[1].trim()
-        if (key && val) r[key] = val
-    }
-    return r
-}
 
 // 解决 JSON 太深问题
 export function getJSONValue(data, keys, value) {

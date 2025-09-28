@@ -8,19 +8,14 @@
  */
 
 let conf, setting
-let searchText, searchList
 document.addEventListener('DOMContentLoaded', async function () {
     await fetch('../conf/conf.json').then(r => r.json()).then(r => {
         conf = r
     })
-    await storageSyncGet(['setting', 'searchText']).then(function (r) {
+    await storageSyncGet(['setting']).then(function (r) {
         setting = r.setting
-        searchText = r.searchText || ''
     })
-    await fetch('../conf/searchText.txt').then(r => r.text()).then(r => {
-        searchText = searchText || r.trim()
-        searchList = getSearchKey(searchText)
-    })
+
     init()
     // debug('conf:', conf)
     // debug('setting:', setting)
@@ -81,15 +76,11 @@ function init() {
     bindSortHTML('展示顺序：', 'setting_dictionary_sort', 'dictionaryList', setting.dictionaryList, conf.dictionaryList)
     bindSortHTML('朗读顺序：', 'setting_dictionary_sound_sort', 'dictionarySoundList', setting.dictionarySoundList, dictionarySoundList)
 
-    // 搜索设置功能
-    initSearch()
-
     // 绑定是否显示"朗读"参数
     bindShow('setting_dictionary_reader', 'dictionarySoundList', setting.dictionarySoundList)
 
     // 本机 TTS 设置
     localTtsSetting()
-    searchListSetting()
 
     // 文字识别设置
     settingOcr()
@@ -98,22 +89,6 @@ function init() {
     $('clearSetting').addEventListener('click', clearSetting)
 }
 
-function initSearch() {
-    settingBoxHTML('setting_search_list', 'searchList', searchList)
-    settingBoxHTML('setting_search_menus', 'searchMenus', searchList)
-    settingBoxHTML('setting_search_side', 'searchSide', searchList)
-
-    setBindValue('searchList', setting.searchList)
-    setBindValue('searchMenus', setting.searchMenus)
-    setBindValue('searchSide', setting.searchSide)
-
-    bindSortHTML('展示顺序：', 'setting_search_sort', 'searchList', setting.searchList, searchList)
-    bindSortHTML('展示顺序：', 'setting_search_menus_sort', 'searchMenus', setting.searchMenus, searchList)
-    bindSortHTML('展示顺序：', 'setting_search_side_sort', 'searchSide', setting.searchSide, searchList)
-
-    // 绑定右键菜单设置
-    bindSearchMenus()
-}
 
 function initLocalSoundReplace() {
     let s = '<option value="">默认</option>'
@@ -124,11 +99,6 @@ function initLocalSoundReplace() {
     N('localSoundReplace')[0].innerHTML = s
 }
 
-function getSearchKey(s) {
-    let r = {}
-    Object.keys(getSearchList(s)).forEach(k => r[k] = k)
-    return r
-}
 
 function navigate(navId, contentSel) {
     let nav = $(navId)
@@ -214,14 +184,6 @@ function bindValue(name, value) {
     })
 }
 
-function bindSearchMenus() {
-    N('searchMenus').forEach(v => {
-        v.addEventListener('change', function () {
-            // firefox 在 iframe 下功能缺失，只能通过 message 处理
-            sendMessage({action: 'menu', name: this.value, isAdd: this.checked})
-        })
-    })
-}
 
 function bindSortHTML(textName, id, name, value, list) {
     sortShow(textName, id, value, list) // 初始值
@@ -285,55 +247,6 @@ function settingOcr() {
     skEl.onblur = () => {
         setSetting('baidu_orc_sk', skEl.value)
         clearFn()
-    }
-}
-
-function searchListSetting() {
-    let dialogEl = $('search_list_dialog')
-    let butEl = $('search_setting_but')
-    let saveEl = $('search_list_save')
-    let textEl = S('textarea[name="search_text"]')
-    butEl.onclick = () => {
-        dialogEl.style.display = 'block'
-        addClass(document.body, 'dmx_overflow_hidden')
-        textEl.value = searchText
-    }
-    saveEl.onclick = () => {
-        searchText = textEl.value.trim()
-        searchList = getSearchKey(searchText)
-
-        // 清理不存在的设置
-        let keyArr = Object.keys(searchList)
-        let funNewArr = function (arr, isMenu) {
-            let newArr = []
-            arr.forEach(v => {
-                if (keyArr.includes(v)) {
-                    newArr.push(v)
-                } else if (isMenu) {
-                    // 移除右键设置
-                    sendMessage({action: 'menu', name: v, isAdd: false})
-                }
-            })
-            return newArr
-        }
-        setting.searchList = funNewArr(setting.searchList)
-        setting.searchMenus = funNewArr(setting.searchMenus)
-        setting.searchSide = funNewArr(setting.searchSide)
-        setSetting('searchList', setting.searchList)
-        setSetting('searchMenus', setting.searchMenus)
-        setSetting('searchSide', setting.searchSide)
-
-        // 重新初始化
-        initSearch()
-
-        sendMessage({action: 'onSaveSearchText', searchText})
-        dal('保存成功')
-    }
-
-    // 关闭设置
-    $('search_list_back').onclick = function () {
-        dialogEl.style.display = 'none'
-        rmClass(document.body, 'dmx_overflow_hidden')
     }
 }
 

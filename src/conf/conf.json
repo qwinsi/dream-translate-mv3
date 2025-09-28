@@ -27,20 +27,6 @@
     ],
     "dictionarySoundList": [],
     "dictionaryReader": "us",
-    "searchList": [
-      "百度搜索",
-      "谷歌搜索",
-      "必应搜索",
-      "360搜索",
-      "搜狗搜索",
-      "谷歌图片",
-      "必应图片",
-      "百度图片",
-      "维基百科",
-      "百度百科"
-    ],
-    "searchMenus": [],
-    "searchSide": [],
     "ttsConf": {}
   },
   "translateList": {
