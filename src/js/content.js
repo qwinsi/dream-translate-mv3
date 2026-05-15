@@ -145,18 +145,15 @@ function isTextArea(element) {
     ) && !element.disabled;
 };
 
-// Code from https://github.com/iorate/uSuperDrag (MIT license)
-function dropEventListener(event) {
+// Code adapted from https://github.com/iorate/uSuperDrag (MIT license)
+function dragendEventListener(event) {
     if (event.dataTransfer.types.includes('text/plain')) {
-        if (!isTextArea(event.target)) {
-            let text = event.dataTransfer.getData('text/plain');
-            text = text.trim();
-            if (text !== '') {
-                initQuery(text, event.clientX + 10, event.clientY - 35);
-            }
-
-            event.preventDefault();
+        let text = window.getSelection()?.toString().trim();
+        if (text !== undefined && text !== '') {
+            initQuery(text, event.clientX + 10, event.clientY - 35);
         }
+
+        event.preventDefault();
     }
 }
 
@@ -170,11 +167,11 @@ function bindDragEvent() {
         }
     }, false);
 
-    document.addEventListener('drop', dropEventListener, false);
+    document.addEventListener('dragend', dragendEventListener, false);
 }
 
 function unbindDragEvent() {
-    document.removeEventListener('drop', dropEventListener, false);
+    document.removeEventListener('dragend', dragendEventListener, false);
 }
 
 function mouseupEventListener(e) {
