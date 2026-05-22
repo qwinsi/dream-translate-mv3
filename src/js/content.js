@@ -17,7 +17,7 @@ let isPopup = window.isPopup
 let isFullscreen, isClipboardRead, isSome
 let dialog, shadow_root,
     setting, conf, dialogConf,
-    languageList, dialogCSS = '', dictionaryCSS = {},
+    languageList, dictionaryCSS = {},
     iconBut, iconText,
     msgList = {},
     root = B.root
@@ -31,10 +31,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     isClipboardRead = u.searchParams.get('clipboardRead') === '1'
     isSome = location.href.indexOf(root) === 0
 
-    await storageLocalGet(['conf', 'languageList', 'dialogCSS', 'dictionaryCSS']).then(function (r) {
+    await storageLocalGet(['conf', 'languageList', 'dictionaryCSS']).then(function (r) {
         conf = r.conf
         languageList = JSON.parse(r.languageList)
-        dialogCSS = r.dialogCSS
         dictionaryCSS = r.dictionaryCSS
     })
 
@@ -191,7 +190,6 @@ function unbindMouseupEvent() {
 function initDialog() {
     let isChange = false
     let options = {
-        cssText: dialogCSS,
         width: dialogConf.width,
         height: dialogConf.height,
         minWidth: 450,
@@ -1206,7 +1204,6 @@ function dmxDialog(options) {
         isMove: true,
         isResize: true,
         onResize: null,
-        cssText: '',
         contentHTML: '',
     }, options || {})
 
@@ -1216,7 +1213,7 @@ function dmxDialog(options) {
 
     shadow_root = d.attachShadow({mode: 'closed'})
     shadow_root.innerHTML = `<link rel="stylesheet" href="${root + 'css/content.css'}">
-<style>${o.cssText}</style>
+    <link rel="stylesheet" href="${root + 'css/dmx_dialog.css'}">
 <div id="dmx_dialog">
     <div id="dmx_dialog_title">
         <div class="dmx_left">
