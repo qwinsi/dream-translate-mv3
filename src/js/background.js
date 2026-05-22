@@ -29,19 +29,14 @@ let ocrToken = '', ocrExpires = 0
 var textTmp = ''
 var historyMax = 3000
 async function main() {
-    let languageList = '', dictionaryCSS = {}
+    let languageList = '';
     await fetch('../conf/conf.json').then(r => r.json()).then(r => {
         conf = r
     })
     await fetch('../conf/language.json').then(r => r.text()).then(s => {
         languageList += s
     })
-    for (let name of conf.dictionaryCSS) {
-        await fetch(`../css/${name}.css`).then(r => r.text()).then(s => {
-            dictionaryCSS[name] = minCss(s)
-        })
-    }
-    storageLocalSet({conf, languageList, dictionaryCSS}).catch(err => debug(`save error: ${err}`))
+    storageLocalSet({conf, languageList}).catch(err => debug(`save error: ${err}`))
 
     await storageSyncGet(['setting']).then(function (r) {
         saveSettingAll(r.setting, true) // 初始设置参数

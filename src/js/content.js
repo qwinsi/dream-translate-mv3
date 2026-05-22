@@ -17,7 +17,7 @@ let isPopup = window.isPopup
 let isFullscreen, isClipboardRead, isSome
 let dialog, shadow_root,
     setting, conf, dialogConf,
-    languageList, dictionaryCSS = {},
+    languageList,
     iconBut, iconText,
     msgList = {},
     root = B.root
@@ -31,10 +31,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     isClipboardRead = u.searchParams.get('clipboardRead') === '1'
     isSome = location.href.indexOf(root) === 0
 
-    await storageLocalGet(['conf', 'languageList', 'dictionaryCSS']).then(function (r) {
+    await storageLocalGet(['conf', 'languageList']).then(function (r) {
         conf = r.conf
         languageList = JSON.parse(r.languageList)
-        dictionaryCSS = r.dictionaryCSS
     })
 
     await storageSyncGet(['setting', 'dialogConf']).then(function (r) {
@@ -44,9 +43,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // 初始对话框
     initDialog()
-
-    // 初始对话框CSS
-    initDictionaryCSS()
 
     // 是否开启自动解除选中现在
     if (setting.allowSelect === 'on' && !isSome) allowUserSelect()
@@ -129,9 +125,6 @@ B.storage.onChanged.addListener(function (data) {
 
             setting = v
             debug('new setting:', v)
-
-            // 初始对话框CSS
-            initDictionaryCSS()
         }
     })
 })
@@ -563,14 +556,6 @@ function initMore() {
     dialog.contentHTML(`<iframe id="dmx_iframe" src="${root + 'html/more.html?isSome=' + isSome}" importance="high"></iframe>`)
 }
 
-function initDictionaryCSS() {
-    let styleEl = shadow_root.querySelector('style')
-    conf.dictionaryCSS.forEach(name => {
-        if (!setting.dictionaryList.includes(name) || !dictionaryCSS[name] || shadow_root.querySelector(`style[data-name="${name}"]`)) return
-        let s = `<style data-name="${name}">${dictionaryCSS[name]}</style>`
-        styleEl.insertAdjacentHTML('afterend', s)
-    })
-}
 
 function initCrop() {
     let startX = 0, startY = 0

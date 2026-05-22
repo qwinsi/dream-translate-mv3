@@ -73,9 +73,6 @@
     "urban": "城市词典",
     "macmillan": "麦克米伦词典"
   },
-  "dictionaryCSS": [
-    "longman"
-  ],
   "dictionarySoundExcluded": [
     "etymonline",
     "urban"
