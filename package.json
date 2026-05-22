@@ -6,8 +6,9 @@
     "prebuild": "rimraf dist dist-firefox && mkdir dist && cp src/manifest.json dist && cp -r src/conf dist && cp -r src/css dist && cp -r src/html dist && cp -r src/icon dist && cp -r src/js dist",
     "build:chromium": "esbuild src/js/background.js --outdir=dist/js --bundle --format=esm && esbuild src/js/content.js --outdir=dist/js --bundle --format=esm && node tool/remove-export.js",
     "build:firefox": "cp -r dist dist-firefox && cp src/manifest-firefox.json dist-firefox/manifest.json && node tool/fix-css.js dist-firefox/css/content.css",
+    "build:chromium-zip": "cd dist && 7z a -tzip ../dream-translate-mv3-chromium.zip * && cd ..",
     "build:firefox-xpi": "cd dist-firefox && 7z a -tzip ../dream-translate-mv3.xpi * && cd ..",
-    "build": "npm run build:chromium && npm run build:firefox && npm run build:firefox-xpi"
+    "build": "npm run build:chromium && npm run build:firefox && npm run build:chromium-zip && npm run build:firefox-xpi"
   },
   "devDependencies": {
     "esbuild": "^0.25.1",
